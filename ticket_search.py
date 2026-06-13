@@ -13,11 +13,11 @@ def ticket_search(phone):
     if row:
         return row._asdict()
 
-def intake(first_name, last_name, phone, email, item_type, service_details, total_bal, status):
+def intake(first_name, last_name, phone, email, item_type, svc_detail, tot_bal, status):
     customer_query = text("INSERT INTO customers (first_name, last_name, phone, email) VALUES (:first_val, :last_val, :phone_val, :email_val) RETURNING customer_id, created_at")
     customer_param = {"first_val": first_name, "last_val": last_name, "phone_val": phone, "email_val": email}
-    ticket_query = text("INSERT INTO  tickets (customer_id, item_type, service_details, total_balance, \"status\") VALUES (:cust_val, :item_val, :service_val, :bal_val, :status_val) RETURNING ticket_id, created_at")
-    ticket_param = {"item_val": item_type, "service_val": service_details, "bal_val": total_bal, "status_val": status}
+    ticket_query = text("INSERT INTO  tickets (customer_id, item_type, svc_detail, tot_bal, \"status\") VALUES (:cust_val, :item_val, :svc_val, :tot_bal_val, :status_val) RETURNING ticket_id, created_at")
+    ticket_param = {"item_val": item_type, "svc_val": svc_detail, "tot_bal_val": tot_bal, "status_val": status}
 
 
     with db.engine.begin() as connection:

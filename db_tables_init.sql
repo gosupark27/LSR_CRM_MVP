@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS customers (
-    customer_id integer UNIQUE,
+    customer_id integer GENERATED ALWAYS AS IDENTITY,
     first_name varchar NOT NULL,
     last_name varchar NOT NULL,
     phone char(10) NOT NULL, 
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 CREATE TABLE IF NOT EXISTS tickets (
-    ticket_id integer UNIQUE, 
+    ticket_id integer GENERATED ALWAYS AS IDENTITY, 
     customer_id integer,
     item_type varchar NOT NULL,
     service_details varchar NOT NULL,

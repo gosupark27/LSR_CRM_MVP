@@ -1,8 +1,12 @@
 import {Button, TextInput} from '@mantine/core';
 import {useForm} from '@mantine/form';
-import axios from 'axios'
+import axios from 'axios';
+import {useState} from 'react';
+import ViewTicket from './ViewTicket'
 
 export default function TicketForm() {
+    const [ticketData, setTicketData] = useState<any>(null);
+
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
@@ -27,6 +31,7 @@ export default function TicketForm() {
         try {
             const response = await axios.post('/v1/tickets', values);
             console.log('Success', response.status, response.data)
+            setTicketData(response.data)
         } catch (error) {
             console.error('Error:', error)
         }
@@ -34,50 +39,53 @@ export default function TicketForm() {
 
 
     return (
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-            <TextInput 
-                withAsterisk
-                label="First name"
-                key={form.key('first_name')}
-                {...form.getInputProps('first_name')}
-            />
-            <TextInput 
-                withAsterisk
-                label="Last name"
-                key={form.key('last_name')}
-                {...form.getInputProps('last_name')}
-            />
-            <TextInput 
-                withAsterisk
-                label="Phone number"
-                key={form.key('phone')}
-                {...form.getInputProps('phone')}
-            />
-            <TextInput 
-                label="Email"
-                placeholder="your@email.com"
-                key={form.key('email')}
-                {...form.getInputProps('email')}
-            />
-            <TextInput 
-                label="item_type"
-                placeholder="Item Category"
-                key={form.key('item_type')}
-                {...form.getInputProps('item_type')}
-            />
-            <TextInput 
-                label="svc_detail"
-                placeholder="Service details"
-                key={form.key('svc_detail')}
-                {...form.getInputProps('svc_detail')}
-            />
-            <TextInput 
-                label="tot_bal"
-                placeholder="Total: $X, Dep: $X, Bal: $X"
-                key={form.key('tot_bal')}
-                {...form.getInputProps('tot_bal')}
-            />
-            <Button size="compact-md" type="submit">Submit</Button>
-        </form>
+        <>
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                <TextInput 
+                    withAsterisk
+                    label="First name"
+                    key={form.key('first_name')}
+                    {...form.getInputProps('first_name')}
+                />
+                <TextInput 
+                    withAsterisk
+                    label="Last name"
+                    key={form.key('last_name')}
+                    {...form.getInputProps('last_name')}
+                />
+                <TextInput 
+                    withAsterisk
+                    label="Phone number"
+                    key={form.key('phone')}
+                    {...form.getInputProps('phone')}
+                />
+                <TextInput 
+                    label="Email"
+                    placeholder="your@email.com"
+                    key={form.key('email')}
+                    {...form.getInputProps('email')}
+                />
+                <TextInput 
+                    label="item_type"
+                    placeholder="Item Category"
+                    key={form.key('item_type')}
+                    {...form.getInputProps('item_type')}
+                />
+                <TextInput 
+                    label="svc_detail"
+                    placeholder="Service details"
+                    key={form.key('svc_detail')}
+                    {...form.getInputProps('svc_detail')}
+                />
+                <TextInput 
+                    label="tot_bal"
+                    placeholder="Total: $X, Dep: $X, Bal: $X"
+                    key={form.key('tot_bal')}
+                    {...form.getInputProps('tot_bal')}
+                />
+                <Button size="compact-md" type="submit">Submit</Button>
+            </form>
+            {ticketData && <ViewTicket {...ticketData}/>}
+        </>
     );
 }
