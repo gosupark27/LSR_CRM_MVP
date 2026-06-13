@@ -1,8 +1,12 @@
 import {Box, Button, TextInput} from '@mantine/core';
 import {useField} from '@mantine/form';
 import axios from 'axios'
+import {useState} from 'react'
+import ViewTicketHistory from './ViewTicketHistory';
 
 export default function TicketSearch() {
+    const [historyData, setHistoryData] = useState<any>(null)
+
     const field = useField({
         initialValue: '',
         validateOnBlur: true,
@@ -14,6 +18,7 @@ export default function TicketSearch() {
         try {
             const response = await axios.get('/v1/tickets', {params: {phone: field.getValue()}})
             console.log('Success', response.status, response.data)
+            setHistoryData(response.data)
         } catch (error) {
             console.error('Error:', error)
         }
@@ -28,6 +33,7 @@ export default function TicketSearch() {
                 {...field.getInputProps()}
             />
             <Button variant="filled" size="compact-md" onClick={field.validate} type="submit">Search</Button>
+            {historyData && <ViewTicketHistory {...historyData}/>}
         </Box>
     );
 }

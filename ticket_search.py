@@ -6,8 +6,8 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:July72794!@localhost:5432/Sandbox_LSR"
 db = SQLAlchemy(app)
 
-def ticket_search(phone):
-    query = text("SELECT created_at, updated_at FROM tickets t WHERE t.customer_id = (SELECT customer_id FROM customers WHERE phone = :phone_val)")
+def ticket_search(phone):   
+    query = text("SELECT ticket_id, created_at, updated_at FROM tickets t WHERE t.customer_id = (SELECT customer_id FROM customers WHERE phone = :phone_val)")
     result = db.session.execute(query, {"phone_val": phone})
     row = result.first()
     if row:
@@ -34,6 +34,7 @@ def intake(first_name, last_name, phone, email, item_type, svc_detail, tot_bal, 
 def get_ticket():
     phone = request.args.get('phone')
     ticket_history = ticket_search(phone)
+    ticket_history['phone'] = phone
 
     return jsonify(ticket_history), 200
 

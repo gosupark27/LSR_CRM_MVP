@@ -1,5 +1,5 @@
 import {Card, Group, Text} from '@mantine/core';
-import { ContactMail } from '@mui/icons-material';
+
 
 interface TicketData {
     first_name: string,
@@ -7,14 +7,11 @@ interface TicketData {
     phone: string,
     email: string, 
     item_type: string,
-    service_details: string,
-    total_bal: string,
+    svc_detail: string,
+    tot_bal: string,
 }
 
-// {first_name, last_name, phone, email, item_type, service_details, total_bal}: ViewTicketProps
-
 export default function ViewTicket(props: TicketData) {
-    console.log(props)
     const customer_name = ["first_name", "last_name"] as const;
     const customer_section = customer_name.map((field) => (
         <div key={field}>
