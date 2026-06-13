@@ -1,0 +1,61 @@
+import {Button, TextInput} from '@mantine/core';
+import {useForm} from '@mantine/form';
+import axios from 'axios'
+
+export default function TicketForm() {
+    const form = useForm({
+        mode: 'uncontrolled',
+        initialValues: {
+            first_name: "",
+            last_name: "",
+            email: "",
+            phone: "",
+        },
+        validate: {
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+            phone: (value) => (/^[0-9]{10}$/.test(value) ? null: 'Invalid phone number'),
+            first_name: (value) => (value.length < 1 ? 'First name must have at least one letter' : null),
+            last_name: (value) => (value.length < 1 ? 'Last name must have at least one letter' : null),
+        },
+    });
+
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/', values);
+            console.log('Success', response.status, response.data)
+        } catch (error) {
+            console.error('Error:', error)
+        }
+    }
+
+
+    return (
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+            <TextInput 
+                withAsterisk
+                label="First name"
+                key={form.key('first_name')}
+                {...form.getInputProps('first_name')}
+            />
+            <TextInput 
+                withAsterisk
+                label="Last name"
+                key={form.key('last_name')}
+                {...form.getInputProps('last_name')}
+            />
+            <TextInput 
+                withAsterisk
+                label="Phone number"
+                key={form.key('phone')}
+                {...form.getInputProps('phone')}
+            />
+            <TextInput 
+                label="Email"
+                placeholder="your@email.com"
+                key={form.key('email')}
+                {...form.getInputProps('email')}
+            />
+            <Button size="compact-md" type="submit">Submit</Button>
+        </form>
+    );
+}

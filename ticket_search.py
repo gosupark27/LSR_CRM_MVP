@@ -1,10 +1,12 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:July72794!@localhost:5432/Sandbox_LSR"
-db = SQLAlchemy(app)
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:July72794!@localhost:5432/Sandbox_LSR"
+# db = SQLAlchemy(app)
 
 def ticket_search(phone):
     query = text("SELECT created_at, updated_at FROM tickets t WHERE t.customer_id = (SELECT customer_id FROM customers WHERE phone = :phone_val)")
@@ -24,8 +26,19 @@ def intake(first_name, last_name, phone, email, customer_id, ticket_id, item_typ
     db.session.commit()
     return customer_result.first(), ticket_result.first()
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def main():
-    ticket_history = ticket_search('5203969284')
-    intake_info = intake('Brew', 'Box', '4805347569', 'brewbox@coffee.co', '2', '1001', 'purse', 'new handles $100', 'Total: $100 Deposit: $50 Balance: $50', 'received')
-    return ticket_history, intake_info
+    payload = request.get_json()
+    first_name = payload["first_name"]
+    last_name = payload["last_name"]
+    phone = payload["phone"]
+    email = payload["email"]
+    
+    return jsonify({
+        "first_name": first_name, 
+        "last_name": last_name,
+        "phone": phone,
+        "email": email}), 200
+# ticket_history = ticket_search(phone)
+    # intake_info = intake('Brew', 'Box', '4805347569', 'brewbox@coffee.co', '2', '1001', 'purse', 'new handles $100', 'Total: $100 Deposit: $50 Balance: $50', 'received')
+    # return ticket_history, intake_info
