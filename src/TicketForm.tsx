@@ -10,6 +10,10 @@ export default function TicketForm() {
             last_name: "",
             email: "",
             phone: "",
+            item_type: "",
+            svc_detail: "",
+            tot_bal: "",
+
         },
         validate: {
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
@@ -21,7 +25,7 @@ export default function TicketForm() {
 
     const handleSubmit = async (values: typeof form.values) => {
         try {
-            const response = await axios.post('http://127.0.0.1:5000/', values);
+            const response = await axios.post('/v1/tickets', values);
             console.log('Success', response.status, response.data)
         } catch (error) {
             console.error('Error:', error)
@@ -54,6 +58,24 @@ export default function TicketForm() {
                 placeholder="your@email.com"
                 key={form.key('email')}
                 {...form.getInputProps('email')}
+            />
+            <TextInput 
+                label="item_type"
+                placeholder="Item Category"
+                key={form.key('item_type')}
+                {...form.getInputProps('item_type')}
+            />
+            <TextInput 
+                label="svc_detail"
+                placeholder="Service details"
+                key={form.key('svc_detail')}
+                {...form.getInputProps('svc_detail')}
+            />
+            <TextInput 
+                label="tot_bal"
+                placeholder="Total: $X, Dep: $X, Bal: $X"
+                key={form.key('tot_bal')}
+                {...form.getInputProps('tot_bal')}
             />
             <Button size="compact-md" type="submit">Submit</Button>
         </form>
