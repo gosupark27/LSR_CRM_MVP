@@ -30,8 +30,15 @@ def intake(first_name, last_name, phone, email, item_type, service_details, tota
 
     return customer_data, ticket_data
 
-@app.route('/v1/tickets', methods=['POST'])
-def main():
+@app.get('/v1/tickets')
+def get_ticket():
+    phone = request.args.get('phone')
+    ticket_history = ticket_search(phone)
+
+    return jsonify(ticket_history), 200
+
+@app.post('/v1/tickets')
+def create_ticket():
     status = 'received'
 
     payload = request.get_json()
@@ -66,4 +73,4 @@ def main():
         "tot_bal": tot_bal,
         "cust_data": db_data_dict["customer"],
         "ticket_data": db_data_dict["ticket"],
-        }), 200
+        }), 201
