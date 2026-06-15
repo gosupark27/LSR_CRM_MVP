@@ -1,23 +1,31 @@
-import {Button, TextInput} from '@mantine/core';
-import {useForm} from '@mantine/form';
+import { Button, TextInput, Select } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { DatePickerInput } from '@mantine/dates'
 import axios from 'axios';
-import {useState} from 'react';
+import { useState } from 'react';
 import ViewTicket from './ViewTicket'
 
 export default function TicketForm() {
     const [ticketData, setTicketData] = useState<any>(null);
+    const [pickupDate, setPickupDate] = useState<string | null>(null)
+
+    const setDate = (event) => {
+        setPickupDate(event.target.value)
+    }
 
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
             first_name: "",
             last_name: "",
-            email: "",
             phone: "",
+            email: "",
+            pickup_date:"",
             item_type: "",
-            svc_detail: "",
-            tot_bal: "",
-
+            category: "",
+            rp_service: "",
+            total: "",
+            deposit: "",
         },
         validate: {
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
@@ -65,23 +73,45 @@ export default function TicketForm() {
                     key={form.key('email')}
                     {...form.getInputProps('email')}
                 />
+                <DatePickerInput
+                    clearable
+                    firstDayOfWeek={0}
+                    label="Select pick up date"
+                    placeholder="Pick date"
+                    excludeDate={(date) => new Date(date).getDay() === 5 || new Date(date).getDay() === 6}
+                    key={form.key('pickup_date')}
+                    {...form.getInputProps('pickup_date')}
+                />
                 <TextInput 
                     label="item_type"
-                    placeholder="Item Category"
+                    placeholder="Item type"
                     key={form.key('item_type')}
                     {...form.getInputProps('item_type')}
                 />
-                <TextInput 
-                    label="svc_detail"
-                    placeholder="Service details"
-                    key={form.key('svc_detail')}
-                    {...form.getInputProps('svc_detail')}
+                <Select
+                    label="Item Category"
+                    placeholder="Pick category"
+                    data={['bags', 'women', 'men', 'luggage', 'clothes', 'other' ]}
+                    key={form.key('category')}
+                    {...form.getInputProps('category')}
                 />
                 <TextInput 
-                    label="tot_bal"
-                    placeholder="Total: $X, Dep: $X, Bal: $X"
-                    key={form.key('tot_bal')}
-                    {...form.getInputProps('tot_bal')}
+                    label="rp_service"
+                    placeholder="Repair service detail"
+                    key={form.key('rp_service')}
+                    {...form.getInputProps('rp_service')}
+                />
+                <TextInput 
+                    label="total"
+                    placeholder="Enter total here"
+                    key={form.key('total')}
+                    {...form.getInputProps('total')}
+                />
+                <TextInput 
+                    label="deposit"
+                    placeholder="Enter deposit here"
+                    key={form.key('deposit')}
+                    {...form.getInputProps('deposit')}
                 />
                 <Button size="compact-md" type="submit">Submit</Button>
             </form>
