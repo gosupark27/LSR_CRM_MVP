@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS customers(
 CREATE TABLE IF NOT EXISTS tickets(
     ticket_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     customer_id INT NOT NULL REFERENCES customers(customer_id),
-    dropoff_date DATE NOT NULL, 
+    dropoff_date DATE NOT NULL DEFAULT NOW(), 
     pickup_date DATE NOT NULL,
-    tk_status VARCHAR CHECK (tk_status IN ('received', 'in_progress', 'ready_for_pickup', 'picked_up')),
+    tk_status VARCHAR DEFAULT 'received' CHECK (tk_status IN ('received', 'in_progress', 'ready_for_pickup', 'picked_up')),
     note VARCHAR,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ
