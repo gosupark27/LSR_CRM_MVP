@@ -6,12 +6,86 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:July72794!@localhost:5432/Sandbox_LSR"
 db = SQLAlchemy(app)
 
+def get_customer(connection, phone):
+    customer_query = text("SELECT first_name, last_name, customer_id FROM customers WHERE phone = :phone")
+    customer_param = {"phone": phone}
+    customer_row = connection.execute(customer_query, customer_param).one()
+    
+    first_name = customer_row.first_name
+    last_name = customer_row.last_name
+    customer_id = customer_row.customer_id
+    return first_name, last_name, customer_id
+
+def get_ticket(connection, customer_id):
+    ticket_query = text("SELECT dropoff_date, pickup_date, tk_status, ticket_id  FROM tickets WHERE customer_id = :customer_id")
+    ticket_param = {"customer_id": customer_id}
+    ticket_rows = connection.execute(ticket_query, ticket_param).all()
+
+    customer_tickets = []
+    
+    for row in ticket_rows:
+        ticket_items = get_item(connection, row.ticket_id)
+        ticket_payment = get_payment(connection, row.ticket_id)
+        ticket_info = {"ticket_id": row.ticket_id, "tk_status": row.tk_status, "dropoff_date": row.dropoff_date, "pickup_date": row.pickup_date, "ticket_items": ticket_items, "ticket_payment": ticket_payment}
+        customer_tickets.append(ticket_info)
+    
+    return customer_tickets
+
+def get_item(connection, ticket_id):
+    item_query = text("SELECT item_type, category, note, item_id FROM items WHERE ticket_id = :ticket_id AND note IS NOT NULL")
+    item_param = {"ticket_id": ticket_id}
+    item_rows = connection.execute(item_query, item_param).all()
+
+    ticket_items = []
+    for row in item_rows:
+        item_repairs = get_repair(connection, row.item_id)
+        item_info = {"item_id": row.item_id, "item_type": row.item_type, "category": row.category, "item_repairs": item_repairs}
+        ticket_items.append(item_info)
+
+    return ticket_items
+    
+
+def get_repair(connection, item_id):
+    repair_query = text("SELECT rp_service, note FROM repairs WHERE item_id = :item_id AND note IS NOT NULL")
+    repair_param = {"item_id": item_id}
+    repair_rows = connection.execute(repair_query, repair_param).all()
+
+    repairs = []
+    for row in repair_rows:
+        service_detail = f"{row.rp_service} {'| Note: {row.note}' if row.note else ''}"
+        repairs.append(service_detail)
+    print(repairs)
+    return repairs
+
+def get_payment(connection, ticket_id):
+    payment_query = text("SELECT total, deposit, balance FROM payments WHERE ticket_id = :ticket_id")
+    payment_param = {"ticket_id": ticket_id}
+    payment_row = connection.execute(payment_query, payment_param).one()
+
+    payment_info = {
+                    "total": payment_row.total,
+                    "deposit": payment_row.deposit,
+                    "balance": payment_row.balance
+    }
+
+    return payment_info
+
 def ticket_search(phone):   
-    query = text("SELECT ticket_id, created_at, updated_at FROM tickets t WHERE t.customer_id = (SELECT customer_id FROM customers WHERE phone = :phone_val)")
-    result = db.session.execute(query, {"phone_val": phone})
-    row = result.first()
-    if row:
-        return row._asdict()
+    with db.engine.begin() as connection:
+        first_name, last_name, customer_id = get_customer(connection, phone)
+        tickets_info = get_ticket(customer_id)
+
+
+
+    customer_info = {"first_name": first_name, "last_name": last_name,}
+
+    search_data = {
+                    "customer_info": customer_info,
+                    "tickets_info": tickets_info
+    }
+
+    return search_data
+    
 
 def add_customer(connection, first_name, last_name, phone, email):
     customer_query = text("INSERT INTO customers (first_name, last_name, phone, email) VALUES (:first_val, :last_val, :phone_val, :email_val) RETURNING customer_id")
