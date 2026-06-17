@@ -1,5 +1,14 @@
-export interface SearchInfo {
+export interface SearchTicketInfo {
     customer_info: CustomerInfo;
+    ticket_info: TicketInfo & {
+        tk_status: Status;
+    };
+};
+
+export interface NewTicketInfo {
+    customer_info: CustomerInfo & {
+        customer_id: string | number;
+    };
     ticket_info: TicketInfo;
 }
 
@@ -8,28 +17,36 @@ export interface CustomerInfo {
     last_name: string;
     phone: string;
     email?: string;
-}
+};
 
 export interface TicketInfo {
     ticket_id?: number | string;
-    tk_status: Status;
     dropoff_date: string;
     pickup_date: string;
     items: Item[];
     payment_info: PaymentInfo;
-}
-
-type Status = "received" | "in_progress" | "ready_for_pickup" | "picked_up"
-
-type Item = {
-    item_id?: number | string;
-    item_type: string;
-    category: string;
-    repairs: string[];
-}
+};
 
 export interface PaymentInfo {
+    ticket_id?: string | number;
     total: number | string;
     deposit: number | string;
     balance: number | string;
+};
+
+type Status = "received" | "in_progress" | "ready_for_pickup" | "picked_up";
+
+export type Item = {
+    item_id?: number | string;
+    item_type: string;
+    category: string;
+    note?: string;
+    repairs: Repair[];
+};
+
+type Repair = {
+    repair_id?: string | number;
+    item_id?: string | number;
+    rp_service: string;
+    note: string;
 }
