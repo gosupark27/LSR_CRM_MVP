@@ -6,13 +6,12 @@ export interface SearchTicketInfo {
 };
 
 export interface NewTicketInfo {
-    customer_info: CustomerInfo & {
-        customer_id: string | number;
-    };
+    customer_info: CustomerInfo;
     ticket_info: TicketInfo;
 }
 
 export interface CustomerInfo {
+    customer_id?: string | number;
     first_name: string;
     last_name: string;
     phone: string;
