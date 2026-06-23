@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Item, ItemDetails, RepairFormValues } from "./src/types.ts";
-import { useForm } from '@mantine/form';
+import { Item, ItemDetails } from "./src/types.ts";
+import { Button } from '@mantine/core';
 import NewItemForm from "./NewItemForm.tsx";
+import NewRepairForm from "./NewRepairForm.tsx";
+import { Repair } from './src/types.ts';
 
 export default function NewTicketForm() {
     const [itemDetails, setItemDetails] = useState<ItemDetails | null>(null);
-    const [repairs, setRepairs] = useState<RepairFormValues>(Repair[]);
+    const [repairs, setRepairs] = useState<Repair[]>([]);
     const [items, setItems] = useState<Item[]>([]);
 
-    const form = useForm
-
-    const handleSubmit = () => {
+    const handleAddItemToTicket = () => {
         if (!itemDetails){
             return;
         };
@@ -23,12 +23,24 @@ export default function NewTicketForm() {
         setItems((prev) => [...prev, completedItem]);
 
         setItemDetails(null);
-        setRepairs([])
-    }
+        setRepairs([]);
+    };
 
     return (
         <>
             <NewItemForm onSaveItemDetails={setItemDetails}/>
+            <NewRepairForm onSaveRepairValues={setRepairs}/>
+            <Button onClick={handleAddItemToTicket}>Add item to ticket</Button>
+            <div>{items.map((item) => {
+                return(
+                    <>
+                        <div>{item.item_type}</div>
+                        <div>{item.category}</div>
+                        <div>{item.repairs[0].rp_service}</div>
+                        <div>{item.repairs[0].note}</div>
+                    </>
+            )
+            })}</div>
         </>
     )
 }
