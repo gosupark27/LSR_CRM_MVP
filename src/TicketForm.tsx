@@ -3,15 +3,10 @@ import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates'
 import axios from 'axios';
 import { useState } from 'react';
-import ViewTicket from './ViewTicket'
+import ViewTicket from './ViewNewTicket'
 
 export default function TicketForm() {
     const [ticketData, setTicketData] = useState<any>(null);
-    const [pickupDate, setPickupDate] = useState<string | null>(null)
-
-    const setDate = (event) => {
-        setPickupDate(event.target.value)
-    }
 
     const form = useForm({
         mode: 'uncontrolled',

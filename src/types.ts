@@ -43,9 +43,15 @@ export type Item = {
     repairs: Repair[];
 };
 
-type Repair = {
+export type ItemDetails = Omit<Item, "repairs">
+
+export type Repair = {
     repair_id?: string | number;
     item_id?: string | number;
     rp_service: string;
     note: string;
+}
+
+export type RepairFormValues = {
+    repairs: Repair[]
 }

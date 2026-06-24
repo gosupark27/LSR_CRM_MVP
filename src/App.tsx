@@ -2,14 +2,15 @@ import "@mantine/core/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { theme } from "./theme";
 import TicketSearch from "./TicketSearch"
-import TicketForm from "./TicketForm"
+// import NewTicketForm from "./NewTicketForm";
+import NewTicketForm from "./NewTicketForm"
+
 
 
 export default function App() {
   return (
       <MantineProvider theme={theme}>
-        <TicketSearch />
-        <TicketForm />
+        <NewTicketForm />
       </MantineProvider>
   );
 }

@@ -2,7 +2,7 @@ import {Box, Button, TextInput} from '@mantine/core';
 import {useField} from '@mantine/form';
 import axios from 'axios'
 import {useState} from 'react'
-import ViewTicketHistory from './ViewTicketHistory';
+import ViewTicketHistory from './ViewTicketSearch';
 
 export default function TicketSearch() {
     const [historyData, setHistoryData] = useState<any>(null)
