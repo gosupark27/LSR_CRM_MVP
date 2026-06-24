@@ -3,7 +3,7 @@ import { MantineProvider } from "@mantine/core";
 import { theme } from "./theme";
 import TicketSearch from "./TicketSearch"
 // import NewTicketForm from "./NewTicketForm";
-import NewTicketForm from "./NewTicketForm"
+import NewTicketForm from "./NewTicketWizard"
 
 
 

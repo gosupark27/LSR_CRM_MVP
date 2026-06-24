@@ -30,7 +30,7 @@ export default function NewCustomerForm({onSaveCustomerDetails} : NewCustomerFor
                     border: '1px solid var(--mantine-color-blue-5)',
                     borderRadius: '3px'
                 }}
-                component='form'
+                component="form"
                 onSubmit={handleSaveCustomer}
                 p="sm"
             >

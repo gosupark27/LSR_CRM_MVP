@@ -20,11 +20,16 @@ export interface CustomerInfo {
 
 export interface TicketInfo {
     ticket_id?: number | string;
-    dropoff_date: string;
-    pickup_date: string;
-    items: Item[];
+    date_info: DateInfo;
     payment_info: PaymentInfo;
+    items: Item[];
 };
+
+export type DateInfo = {
+    readonly dropoff_date: string;
+    pickup_date: string | null;
+    urgent: boolean;
+}
 
 export interface PaymentInfo {
     ticket_id?: string | number;
