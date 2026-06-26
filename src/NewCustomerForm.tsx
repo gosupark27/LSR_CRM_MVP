@@ -3,7 +3,7 @@ import { CustomerInfo } from "./types"
 import { Box, Group, TextInput, Button } from "@mantine/core";
 
 interface NewCustomerFormProps {
-    onSaveCustomerDetails: (customerDetails : CustomerInfo) => void
+    onSaveCustomerDetails: (customerDetails : CustomerInfo) => void;
 }
 
 export default function NewCustomerForm({onSaveCustomerDetails} : NewCustomerFormProps){

@@ -1,7 +1,7 @@
 import { TicketInfo } from "./types"
 
 interface CreatedTicketStepProps {
-    createdTicketPayload: TicketInfo
+    createdTicketPayload: TicketInfo | null
 }
 
 export default function CreatedTicketStep({createdTicketPayload} : CreatedTicketStepProps) {

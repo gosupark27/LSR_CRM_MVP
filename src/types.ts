@@ -1,4 +1,4 @@
-export interface SearchTicketInfo {
+export interface TicketInfo {
     customer_info: CustomerInfo;
     ticket_info: TicketInfo & {
         tk_status: Status;
@@ -8,7 +8,7 @@ export interface SearchTicketInfo {
 export interface NewTicketInfo {
     customer_info: CustomerInfo;
     ticket_info: TicketInfo;
-}
+};
 
 export interface CustomerInfo {
     customer_id?: string | number;
