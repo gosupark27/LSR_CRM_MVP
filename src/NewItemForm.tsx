@@ -44,7 +44,7 @@ export default function NewItemForm({onSaveItemDetails} :  ItemFormProps){
                         key={itemForm.key('item_type')}
                         {...itemForm.getInputProps('item_type')}
                     />
-                    <Button type="submit">Save Item</Button>
+                    <Button type="submit">Add Item</Button>
                 </Group>
             </Box>
         </>

@@ -63,6 +63,32 @@ export default function NewTicketWizard() {
     setRepairs([...repairs, newRepair]);
   };
 
+  const onSaveItemDetails = (itemDetail: ItemDetails) => {
+    setItemDetails(itemDetail);
+
+    itemDetail.item_id = crypto.randomUUID();
+    const newItem = { ...itemDetail, repairs: [] };
+
+    setItems([...items, newItem]);
+    setRepairs([]);
+  };
+
+  const onSaveRepair = (repair: Repair) => {
+    const updatedRepairs = [...repairs, repair];
+    setRepairs(updatedRepairs);
+    setItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.item_id === itemDetails?.item_id) {
+          return {
+            ...item,
+            repairs: updatedRepairs,
+          };
+        }
+        return item;
+      }),
+    );
+  };
+
   const handleAddItemToTicket = () => {
     if (!itemDetails) {
       return;
@@ -84,8 +110,8 @@ export default function NewTicketWizard() {
       case 0:
         return (
           <BuildTicketStep
-            onSaveItemDetails={setItemDetails}
-            onSaveRepairValues={handleAddNewRepair}
+            onSaveItemDetails={onSaveItemDetails}
+            onSaveRepair={onSaveRepair}
           />
         );
       case 1:
@@ -159,7 +185,7 @@ export default function NewTicketWizard() {
           <Stack>
             {/* <NewItemForm onSaveItemDetails={setItemDetails} />
             <NewRepairForm
-              onSaveRepairValues={(newRepair) => {
+              onSaveRepair={(newRepair) => {
                 setRepairs([...repairs, newRepair]);
               }}
             />
@@ -167,14 +193,17 @@ export default function NewTicketWizard() {
 
             <NewCustomerForm onSaveCustomerDetails={setCustomerDetails} />
             <NewScheduleForm onSaveDateDetails={setDateDetails} /> */}
-             {mainView(active)}
+            {mainView(active)}
             <Center>
               <Group justify="space-between">
-                <Button variant="default" onClick={() => handleStepChange(active - 1)}>
-                    Back
+                <Button
+                  variant="default"
+                  onClick={() => handleStepChange(active - 1)}
+                >
+                  Back
                 </Button>
                 <Button onClick={() => handleStepChange(active + 1)}>
-                    Next Step
+                  Next Step
                 </Button>
               </Group>
             </Center>
