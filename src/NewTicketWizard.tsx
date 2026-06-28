@@ -17,16 +17,19 @@ import {
   ItemDetails,
   Repair,
   TicketInfo,
+  PaymentInfo,
+  createDefaultTicketPayload,
 } from "./types.ts";
-import NewItemForm from "./NewItemForm.tsx";
-import NewRepairForm from "./NewRepairForm.tsx";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
-import NewCustomerForm from "./NewCustomerForm.tsx";
-import NewScheduleForm from "./NewScheduleForm.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
 import CustomerInfoStep from "./CustomerInfoStep.tsx";
 import CreatedTicketStep from "./CreatedTicketStep.tsx";
 import ReviewTicketStep from "./ReviewTicketStep.tsx";
+import {
+  NewTicketFormProvider,
+  useNewTicketForm,
+} from "./NewTicketFormContext.ts";
+import { ItemIndexContext } from "./TicketIndexContext.ts";
 
 export default function NewTicketWizard() {
   const [itemDetails, setItemDetails] = useState<ItemDetails | null>(null);
@@ -35,10 +38,11 @@ export default function NewTicketWizard() {
   const [customerDetails, setCustomerDetails] = useState<CustomerInfo | null>(
     null,
   );
-  const [dateDetails, setDateDetails] = useState<DateInfo>();
-  const [ticketPayload, setTicketPayload] = useState<NewTicketInfo | null>(
+  const [dateDetails, setDateDetails] = useState<DateInfo | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentInfo | null>(
     null,
   );
+
   const [createdTicketPayload, setCreatedTicketPayload] =
     useState<TicketInfo | null>(null);
 
@@ -56,6 +60,19 @@ export default function NewTicketWizard() {
     setHighestStepVisited((hSC) => Math.max(hSC, highestStepVisited));
   };
 
+  const ticketPayload: NewTicketInfo = createDefaultTicketPayload();
+
+  const form = useNewTicketForm({
+    initialValues: createDefaultTicketPayload(),
+  });
+
+  const itemsIndex = form.values.ticket_info.items.length - 1;
+  const itemPath = `ticket_info.items`;
+  const repairsIndex =
+    form.values.ticket_info.items[itemsIndex].repairs.length > 0
+      ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
+      : 0;
+
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
 
@@ -63,14 +80,17 @@ export default function NewTicketWizard() {
     setRepairs([...repairs, newRepair]);
   };
 
-  const onSaveItemDetails = (itemDetail: ItemDetails) => {
-    setItemDetails(itemDetail);
-
-    itemDetail.item_id = crypto.randomUUID();
-    const newItem = { ...itemDetail, repairs: [] };
-
-    setItems([...items, newItem]);
-    setRepairs([]);
+  const onSaveItemDetails = () => {
+    console.log("HELLO onSaveItemDetails")
+    const newItem = {
+      item_type: form.values.ticket_info.items[itemsIndex].item_type,
+      category: form.values.ticket_info.items[itemsIndex].category,
+      repairs: [],
+      item_id: crypto.randomUUID()
+    };
+    console.log(newItem)
+    form.insertListItem(`${itemPath}`, newItem);
+    console.log("Items updated: ", form.values.ticket_info.items);
   };
 
   const onSaveRepair = (repair: Repair) => {
@@ -89,6 +109,10 @@ export default function NewTicketWizard() {
     );
   };
 
+  const onSaveDateDetails = (dateDetail: DateInfo) => {
+    setDateDetails(dateDetail);
+  };
+
   const handleAddItemToTicket = () => {
     if (!itemDetails) {
       return;
@@ -105,38 +129,89 @@ export default function NewTicketWizard() {
     setRepairs([]);
   };
 
+  const onSubmitTicketPayload = () => form.values;
+
   const mainView = (active: number) => {
     switch (active) {
       case 0:
         return (
-          <BuildTicketStep
-            onSaveItemDetails={onSaveItemDetails}
-            onSaveRepair={onSaveRepair}
-          />
+          <ItemIndexContext.Provider
+            value={itemsIndex}
+            key={
+              form.values.ticket_info.items[itemsIndex].item_id ?? itemsIndex
+            }
+          >
+            <BuildTicketStep
+              onSaveItemDetails={onSaveItemDetails}
+              onSaveRepair={onSaveRepair}
+              nextButtonLabel={getNextButtonLabel(active)}
+            />
+          </ItemIndexContext.Provider>
         );
       case 1:
         return (
           <CustomerInfoStep
             onSaveCustomerDetails={setCustomerDetails}
             onSaveDateDetails={setDateDetails}
+            nextButtonLabel={getNextButtonLabel(active)}
           />
         );
       case 2:
         return (
           <ReviewTicketStep
-            handleCreateTicket={setTicketPayload}
-            ticketDraft={ticketPayload}
+            onSubmitTicketPayload={onSubmitTicketPayload}
+            ticketDraft={form.values}
+            nextButtonLabel={getNextButtonLabel(active)}
           />
         );
       case 3:
         return (
-          <CreatedTicketStep createdTicketPayload={createdTicketPayload} />
+          <CreatedTicketStep
+            createdTicketPayload={ticketPayload} //change later to API response obj
+            nextButtonLabel={getNextButtonLabel(active)}
+          />
         );
     }
   };
 
+  const renderAsideView = (itemsIndex: number) => {
+    return (
+      <ItemIndexContext.Provider
+        value={itemsIndex}
+        key={form.values.ticket_info.items[itemsIndex].item_id ?? itemsIndex}
+      >
+        <LiveWorkOrder />
+      </ItemIndexContext.Provider>
+    );
+  };
+
+  const getNextButtonLabel = (active: number) => {
+    switch (active) {
+      case 0:
+        return "Continue to Customer Details";
+      case 1:
+        return "Continue to Review";
+      case 2:
+        return "Create Ticket";
+      case 3:
+        return "New Ticket";
+      default:
+        return "Next Step";
+    }
+  };
+
+  //   const onNextStep = (active: number) => {
+  //     switch (active) {
+  //       case 0:
+  //         return {
+  //           onSaveCustomerDetails: onSaveItemDetails,
+  //           onSaveDateDetails: onSave,
+  //         };
+  //     }
+  //   };
+
   return (
-    <>
+    <NewTicketFormProvider form={form}>
       <AppShell
         padding="md"
         // component="form"
@@ -181,18 +256,9 @@ export default function NewTicketWizard() {
             </Stepper>
           </Flex>
         </AppShell.Header>
+
         <AppShell.Main>
           <Stack>
-            {/* <NewItemForm onSaveItemDetails={setItemDetails} />
-            <NewRepairForm
-              onSaveRepair={(newRepair) => {
-                setRepairs([...repairs, newRepair]);
-              }}
-            />
-            <Button onClick={handleAddItemToTicket}>Add item to ticket</Button>
-
-            <NewCustomerForm onSaveCustomerDetails={setCustomerDetails} />
-            <NewScheduleForm onSaveDateDetails={setDateDetails} /> */}
             {mainView(active)}
             <Center>
               <Group justify="space-between">
@@ -209,10 +275,8 @@ export default function NewTicketWizard() {
             </Center>
           </Stack>
         </AppShell.Main>
-        <AppShell.Aside>
-          <LiveWorkOrder itemsList={items} />
-        </AppShell.Aside>
+        <AppShell.Aside>{renderAsideView(itemsIndex)}</AppShell.Aside>
       </AppShell>
-    </>
+    </NewTicketFormProvider>
   );
 }

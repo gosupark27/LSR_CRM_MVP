@@ -16,13 +16,15 @@ import {
 import { NewTicketInfo } from "./types";
 
 interface ReviewTicketStepProps {
-  ticketDraft: NewTicketInfo | null;
-  handleCreateTicket: (ticketDraft: NewTicketInfo | null) => void;
+  ticketDraft: NewTicketInfo;
+  onSubmitTicketPayload: () => void;
+  nextButtonLabel: string;
 }
 
 export default function ReviewTicketStep({
   ticketDraft,
-  handleCreateTicket,
+  onSubmitTicketPayload,
+  nextButtonLabel,
 }: ReviewTicketStepProps) {
   return (
     <Box>
@@ -106,14 +108,14 @@ export default function ReviewTicketStep({
           <Stack gap="xs" my="xl" pt="xs">
             <Divider size="sm" label={<Text fw={600}>CONTACT INFO</Text>} />
             <Text c="dimmed" fw={300}>
-              Josh Park
+              {`${ticketDraft.customer_info.first_name} ${ticketDraft.customer_info.last_name}`}
             </Text>
             <Group justify="flex-start" wrap="nowrap">
               <Text c="dimmed" fw={300}>
-                5203969284,
+                {`${ticketDraft.customer_info.phone},`}
               </Text>
               <Text c="dimmed" fw={300}>
-                gosupark27@gmail.com
+                {ticketDraft.customer_info.email}
               </Text>
             </Group>
             <Group justify="space-between" my="xs">
@@ -132,15 +134,19 @@ export default function ReviewTicketStep({
             />
             <Stack gap="xs">
               <Text fw={500}>Dropoff Date</Text>
-              <Text c="dimmed">06/24/26</Text>
+              <Text c="dimmed">
+                {ticketDraft.ticket_info.date_info.dropoff_date}
+              </Text>
             </Stack>
             <Stack gap="xs">
               <Text fw={500}>Pickup Date</Text>
-              <Text c="dimmed">07/09/26</Text>
+              <Text c="dimmed">
+                {ticketDraft.ticket_info.date_info.pickup_date}
+              </Text>
             </Stack>
             <Checkbox
               label={<Text fw={500}>Expedited service</Text>}
-              defaultChecked
+              checked={ticketDraft.ticket_info.date_info.urgent}
               labelPosition="left"
               styles={{
                 body: { alignItems: "flex-end" },
@@ -169,8 +175,8 @@ export default function ReviewTicketStep({
           </Stack>
         </Paper>
         <Center>
-          <Button size="lg" onClick={() => handleCreateTicket(ticketDraft)}>
-            Create Ticket
+          <Button size="lg" onClick={() => onSubmitTicketPayload()}>
+            {nextButtonLabel}
           </Button>
         </Center>
       </Container>

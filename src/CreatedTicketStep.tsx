@@ -1,13 +1,18 @@
-import { TicketInfo } from "./types"
+import { Button } from "@mantine/core";
+import { NewTicketInfo, TicketInfo } from "./types";
 
 interface CreatedTicketStepProps {
-    createdTicketPayload: TicketInfo | null
+  createdTicketPayload: NewTicketInfo; // Change later to TicketInfo type?
+  nextButtonLabel: string;
 }
 
-export default function CreatedTicketStep({createdTicketPayload} : CreatedTicketStepProps) {
-
-    return(
-        <>
-        </>
-    )
+export default function CreatedTicketStep({
+  createdTicketPayload,
+  nextButtonLabel,
+}: CreatedTicketStepProps) {
+  return (
+    <>
+      <Button>{nextButtonLabel}</Button>
+    </>
+  );
 }
