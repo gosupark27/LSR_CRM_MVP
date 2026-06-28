@@ -4,7 +4,7 @@ import { ItemDetails, Repair } from "./types";
 
 interface BuildTicketStepProps {
     onSaveItemDetails: (itemDetails : ItemDetails) => void;
-    onSaveRepairValues: (newRepair : Repair) => void;
+    onSaveRepairValues: (repair : Repair) => void;
 };
 
 export default function BuildTicketStep({onSaveItemDetails, onSaveRepairValues} : BuildTicketStepProps) {

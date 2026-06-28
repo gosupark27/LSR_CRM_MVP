@@ -73,7 +73,7 @@ export default function NewTicketWizard() {
     setRepairs([]);
   };
 
-  const onSaveRepair = (repair: Repair) => {
+  const onSaveRepairValues = (repair: Repair) => {
     const updatedRepairs = [...repairs, repair];
     setRepairs(updatedRepairs);
     setItems((prevItems) =>
@@ -111,7 +111,7 @@ export default function NewTicketWizard() {
         return (
           <BuildTicketStep
             onSaveItemDetails={onSaveItemDetails}
-            onSaveRepair={onSaveRepair}
+            onSaveRepairValues={onSaveRepairValues}
           />
         );
       case 1:

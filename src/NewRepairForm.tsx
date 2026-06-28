@@ -3,10 +3,10 @@ import { Box, Group, Button, TextInput } from '@mantine/core';
 import { useForm } from "@mantine/form";
 
 interface RepairFormProps {
-    onSaveRepair: (repairs : Repair) => void
+    onSaveRepairValues: (repairs : Repair) => void
 }
 
-export default function NewRepairForm({onSaveRepair} : RepairFormProps) { 
+export default function NewRepairForm({onSaveRepairValues} : RepairFormProps) { 
     const repairForm = useForm<Repair>({
         mode:'uncontrolled',
         initialValues: {
@@ -21,7 +21,7 @@ export default function NewRepairForm({onSaveRepair} : RepairFormProps) {
             "note": values.note
         }
 
-        onSaveRepair(newRepair);
+        onSaveRepairValues(newRepair);
         repairForm.reset();
     });
     
