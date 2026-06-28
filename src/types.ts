@@ -56,6 +56,20 @@ export type RepairFormValues = {
   repairs: Repair[];
 };
 
+export type DraftTicketPayload = NewTicketInfo & {
+    draftItem: {
+        item_type: '',
+        category: '',
+        note: '',
+        repairs: []
+    },
+    draftRepair: {
+        rp_service: '',
+        note: '',
+        cost: ''
+    }
+}
+
 export const createDefaultTicketPayload = (): NewTicketInfo => ({
   customer_info: {
     first_name: "",
@@ -75,19 +89,6 @@ export const createDefaultTicketPayload = (): NewTicketInfo => ({
       deposit: "",
       balance: "",
     },
-    items: [
-      {
-        item_type: "",
-        category: "",
-        note: "",
-        repairs: [
-          {
-            rp_service: "",
-            note: "",
-            cost: "",
-          },
-        ],
-      },
-    ],
+    items:[],
   },
 });

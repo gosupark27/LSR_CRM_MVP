@@ -1,8 +1,8 @@
 import { createFormContext } from "@mantine/form";
-import { NewTicketInfo } from "./types";
+import { DraftTicketPayload } from "./types";
 
 export const[
     NewTicketFormProvider,
     useNewTicketFormContext,
     useNewTicketForm
-] = createFormContext<NewTicketInfo>();
+] = createFormContext<DraftTicketPayload>();

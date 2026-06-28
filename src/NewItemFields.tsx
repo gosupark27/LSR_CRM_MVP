@@ -1,54 +1,54 @@
+import { act } from "react";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
-import { Box, Button, Group, TextInput } from "@mantine/core";
-import { ItemDetails } from "./types";
-import { useContext } from "react";
-import { ItemIndexContext } from "./TicketIndexContext";
+import { Button, Group, Stack, TextInput } from "@mantine/core";
 
 interface NewItemFieldsProps {
-    onSaveItemDetails: (itemDetails : ItemDetails) => void;
+  onSetActiveItemIndex: () => void;
+  activeItemIndex: number;
 }
 
-export default function NewItemFields({onSaveItemDetails} : NewItemFieldsProps) {
+export default function NewItemFields({
+  onSetActiveItemIndex,
+  activeItemIndex,
+}: NewItemFieldsProps) {
   const form = useNewTicketFormContext();
 
-  const itemsIndex = useContext(ItemIndexContext);
-  if (itemsIndex === null) {
-    throw new Error(
-      "NewRepairFields must be rendered inside ItemIndexContext.Provider",
-    );
-  }
-  const itemPath = `ticket_info.items.${itemsIndex}`;
 
   const handleSaveItem = () => {
-    const itemDetails = {
-        item_type: form.values.ticket_info.items[itemsIndex].item_type,
-        category: form.values.ticket_info.items[itemsIndex].category,
-        repairs: [],
-        item_id: crypto.randomUUID()
-    }
-    // onSaveItemDetails(itemDetails)
-    form.insertListItem('ticket_info.items', itemDetails)
-    form.setFieldValue(`${itemPath}.category`, "")
-    form.resetField(`${itemPath}.item_type`)
-    console.log("Items array:", form.values.ticket_info.items)
-    // console.log("After being clicked it should be blank:", itemDetails);
-  }
+    const item = form.getValues().draftItem;
+    const newItem = {
+      item_type: item.item_type,
+      category: item.category,
+      repairs: [],
+      item_id: crypto.randomUUID(),
+    };
+    form.insertListItem("ticket_info.items", newItem);
+    onSetActiveItemIndex;
+    form.resetField("draftItem");
+  };
 
   return (
-    <Group wrap="nowrap" justify="space-between" align="flex-end">
-      <Group>
+    <Stack>
+      <Group wrap="nowrap" justify="flex-start">
         <TextInput
           label="Category"
-          key={form.key(`${itemPath}.category`)}
-          {...form.getInputProps(`${itemPath}.category`)}
+          key={form.key(`draftItem.category`)}
+          {...form.getInputProps(`draftItem.category`)}
         />
         <TextInput
           label="Item Type"
-          key={form.key(`${itemPath}.item_type`)}
-          {...form.getInputProps(`${itemPath}.item_type`)}
+          key={form.key(`draftItem.item_type`)}
+          {...form.getInputProps(`draftItem.item_type`)}
         />
       </Group>
-      <Button onClick={handleSaveItem}>Add Item</Button>
-    </Group>
+      <Group wrap="nowrap" justify="space-between" align="flex-end">
+        <TextInput
+          label="Note"
+          key={form.key(`draftItem.note`)}
+          {...form.getInputProps(`draftItem.note`)}
+        />
+        <Button onClick={handleSaveItem}>Add Item</Button>
+      </Group>
+    </Stack>
   );
 }

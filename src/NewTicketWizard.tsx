@@ -19,6 +19,7 @@ import {
   TicketInfo,
   PaymentInfo,
   createDefaultTicketPayload,
+  DraftTicketPayload,
 } from "./types.ts";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
@@ -29,9 +30,11 @@ import {
   NewTicketFormProvider,
   useNewTicketForm,
 } from "./NewTicketFormContext.ts";
-import { ItemIndexContext } from "./TicketIndexContext.ts";
 
 export default function NewTicketWizard() {
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [activeRepairIndex, setActiveRepairIndex] = useState(0);
+
   const [itemDetails, setItemDetails] = useState<ItemDetails | null>(null);
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -46,7 +49,7 @@ export default function NewTicketWizard() {
   const [createdTicketPayload, setCreatedTicketPayload] =
     useState<TicketInfo | null>(null);
 
-  const [active, setActive] = useState(3);
+  const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
 
   const handleStepChange = (nextStep: number) => {
@@ -63,15 +66,28 @@ export default function NewTicketWizard() {
   const ticketPayload: NewTicketInfo = createDefaultTicketPayload();
 
   const form = useNewTicketForm({
-    initialValues: createDefaultTicketPayload(),
+    initialValues: {
+      ...createDefaultTicketPayload(),
+      draftItem: {
+        item_type: "",
+        category: "",
+        note: "",
+        repairs: [],
+      },
+      draftRepair: {
+        rp_service: "",
+        note: "",
+        cost: "",
+      },
+    },
   });
 
-  const itemsIndex = form.values.ticket_info.items.length - 1;
-  const itemPath = `ticket_info.items`;
-  const repairsIndex =
-    form.values.ticket_info.items[itemsIndex].repairs.length > 0
-      ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
-      : 0;
+//   const itemsIndex = form.values.ticket_info.items.length - 1;
+//   const itemPath = `ticket_info.items`;
+//   const repairsIndex =
+//     form.values.ticket_info.items[itemsIndex].repairs.length > 0
+//       ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
+//       : 0;
 
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
@@ -80,18 +96,18 @@ export default function NewTicketWizard() {
     setRepairs([...repairs, newRepair]);
   };
 
-  const onSaveItemDetails = () => {
-    console.log("HELLO onSaveItemDetails")
-    const newItem = {
-      item_type: form.values.ticket_info.items[itemsIndex].item_type,
-      category: form.values.ticket_info.items[itemsIndex].category,
-      repairs: [],
-      item_id: crypto.randomUUID()
-    };
-    console.log(newItem)
-    form.insertListItem(`${itemPath}`, newItem);
-    console.log("Items updated: ", form.values.ticket_info.items);
-  };
+//   const onSaveItemDetails = () => {
+//     console.log("HELLO onSaveItemDetails");
+//     const newItem = {
+//       item_type: form.values.ticket_info.items[itemsIndex].item_type,
+//       category: form.values.ticket_info.items[itemsIndex].category,
+//       repairs: [],
+//       item_id: crypto.randomUUID(),
+//     };
+//     console.log(newItem);
+//     form.insertListItem(`${itemPath}`, newItem);
+//     console.log("Items updated: ", form.values.ticket_info.items);
+//   };
 
   const onSaveRepair = (repair: Repair) => {
     const updatedRepairs = [...repairs, repair];
@@ -131,22 +147,24 @@ export default function NewTicketWizard() {
 
   const onSubmitTicketPayload = () => form.values;
 
+  const onSetActiveItemIndex = () => setActiveItemIndex(activeItemIndex + 1);
+  const onSetActiveRepairIndex = () => setActiveRepairIndex(form.getValues().ticket_info.items[activeItemIndex].repairs.length);
+
+/*wah wah */
+  console.log("activeItemIndex", activeItemIndex)
+  console.log("items array", form.getValues().ticket_info.items)
+
   const mainView = (active: number) => {
     switch (active) {
       case 0:
         return (
-          <ItemIndexContext.Provider
-            value={itemsIndex}
-            key={
-              form.values.ticket_info.items[itemsIndex].item_id ?? itemsIndex
-            }
-          >
-            <BuildTicketStep
-              onSaveItemDetails={onSaveItemDetails}
-              onSaveRepair={onSaveRepair}
-              nextButtonLabel={getNextButtonLabel(active)}
-            />
-          </ItemIndexContext.Provider>
+          <BuildTicketStep
+            activeItemIndex={activeItemIndex}
+            onSetActiveItemIndex={onSetActiveItemIndex}
+            activeRepairIndex={activeRepairIndex}
+            onSetActiveRepairIndex={onSetActiveRepairIndex}
+            nextButtonLabel={getNextButtonLabel(active)}
+          />
         );
       case 1:
         return (
@@ -174,16 +192,11 @@ export default function NewTicketWizard() {
     }
   };
 
-  const renderAsideView = (itemsIndex: number) => {
-    return (
-      <ItemIndexContext.Provider
-        value={itemsIndex}
-        key={form.values.ticket_info.items[itemsIndex].item_id ?? itemsIndex}
-      >
-        <LiveWorkOrder />
-      </ItemIndexContext.Provider>
-    );
-  };
+  //   const renderAsideView = () => {
+  //     return (
+  //         <LiveWorkOrder />
+  //     );
+  //   };
 
   const getNextButtonLabel = (active: number) => {
     switch (active) {
@@ -275,7 +288,9 @@ export default function NewTicketWizard() {
             </Center>
           </Stack>
         </AppShell.Main>
-        <AppShell.Aside>{renderAsideView(itemsIndex)}</AppShell.Aside>
+        <AppShell.Aside>
+          {/* <LiveWorkOrder activeItemIndex={activeItemIndex}/> */}
+        </AppShell.Aside>
       </AppShell>
     </NewTicketFormProvider>
   );

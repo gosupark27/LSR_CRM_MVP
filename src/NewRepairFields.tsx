@@ -1,44 +1,59 @@
-import { Box, Button, Group, Stack, TextInput } from "@mantine/core";
+import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
-import { useContext } from "react";
-import { ItemIndexContext } from "./TicketIndexContext";
+import { Repair } from "./types";
 
-export default function NewRepairFields() {
+interface NewRepairFieldsProps {
+  onSetActiveRepairIndex: (index: number) => void;
+  activeItemIndex: number;
+  activeRepairIndex: number;
+}
+export default function NewRepairFields({
+  activeItemIndex,
+  activeRepairIndex,
+  onSetActiveRepairIndex,
+}: NewRepairFieldsProps) {
   const form = useNewTicketFormContext();
-  const itemIndex = useContext(ItemIndexContext);
-  
-  if (itemIndex === null) {
-    throw new Error(
-      "NewRepairFields must be rendered inside ItemIndexContext.Provider",
-    );
-  }
+  const repairPath = `drafItem.${activeItemIndex}.repairs.${activeRepairIndex}`;
 
-  // need to update repairSIndex with RepairIndexContext
-  const repairsIndex =
-    form.values.ticket_info.items[itemIndex].repairs.length - 1;
-  const repairPath = `ticket_info.items.${itemIndex}.repairs.${repairsIndex}`;
+  const handleAddRepair = () => {
+    console.log("NewRepairFields activeItemIndex", activeItemIndex);
+    console.log("NewRepairFields Items prop", form.getValues().ticket_info.items[activeItemIndex].repairs);
+    const newRepair: Repair = {
+      rp_service: form.values.draftRepair.rp_service,
+      note: form.values.draftRepair.note,
+      cost: form.values.draftRepair.cost,
+      repair_id: crypto.randomUUID(),
+    };
+
+    form.insertListItem(
+      `ticket_info.items.${activeItemIndex}.repairs`,
+      newRepair,
+    );
+    onSetActiveRepairIndex;
+    form.resetField('draftRepair');
+  };
 
   return (
     <Stack>
       <Group wrap="nowrap" justify="flex-start">
         <TextInput
           label="Repair Service"
-          key={form.key(`${repairPath}.rp_service`)}
-          {...form.getInputProps(`${repairPath}.rp_service`)}
+          key={form.key(`draftRepair.rp_service`)}
+          {...form.getInputProps(`draftRepair.rp_service`)}
         />
         <TextInput
           label="Note"
-          key={form.key(`${repairPath}.note`)}
-          {...form.getInputProps(`${repairPath}.note`)}
+          key={form.key(`draftRepair.note`)}
+          {...form.getInputProps(`draftRepair.note`)}
         />
       </Group>
       <Group wrap="nowrap" justify="space-between" align="flex-end">
         <TextInput
           label="Cost"
-          key={form.key(`${repairPath}.cost`)}
-          {...form.getInputProps(`${repairPath}.cost`)}
+          key={form.key(`draftRepair.cost`)}
+          {...form.getInputProps(`draftRepair.cost`)}
         />
-        <Button>Add Repair</Button>
+        <Button onClick={handleAddRepair}>Add Repair</Button>
       </Group>
     </Stack>
   );
