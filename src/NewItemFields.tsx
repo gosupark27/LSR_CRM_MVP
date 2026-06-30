@@ -1,4 +1,3 @@
-import { act } from "react";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 
