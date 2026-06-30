@@ -35,7 +35,7 @@ export interface PaymentInfo {
 }
 
 export type Item = {
-  item_id?: number | string;
+  item_id: string;
   item_type: string;
   category: string;
   note?: string;

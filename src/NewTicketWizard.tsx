@@ -291,7 +291,7 @@ export default function NewTicketWizard() {
           </Stack>
         </AppShell.Main>
         <AppShell.Aside>
-          {/* <LiveWorkOrder activeItemIndex={activeItemIndex}/> */}
+          <LiveWorkOrder/>
         </AppShell.Aside>
       </AppShell>
     </NewTicketFormProvider>

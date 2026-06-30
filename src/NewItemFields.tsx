@@ -18,6 +18,7 @@ export default function NewItemFields({
     const newItem = {
       item_type: item.item_type,
       category: item.category,
+      note: item.note,
       repairs: [],
       item_id: crypto.randomUUID(),
     };
