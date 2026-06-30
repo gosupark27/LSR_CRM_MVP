@@ -11,8 +11,8 @@ import NewItemFields from "./NewItemFields";
 import NewRepairFields from "./NewRepairFields";
 
 interface BuildTicketStepProps {
-  onSetActiveItemIndex: () => void;
-  onSetActiveRepairIndex: () => void;
+  onSetActiveItemIndex: (index: number) => void;
+  onSetActiveRepairIndex: (index: number) => void;
   nextButtonLabel: string;
   activeRepairIndex: number;
   activeItemIndex: number;
@@ -23,9 +23,8 @@ export default function BuildTicketStep({
   onSetActiveRepairIndex,
   nextButtonLabel,
   activeRepairIndex,
-  activeItemIndex
+  activeItemIndex,
 }: BuildTicketStepProps) {
-
   return (
     <Box>
       <Container>
@@ -39,7 +38,10 @@ export default function BuildTicketStep({
                 </Text>
               }
             />
-            <NewItemFields onSetActiveItemIndex={onSetActiveItemIndex} activeItemIndex={activeItemIndex}/>
+            <NewItemFields
+              onSetActiveItemIndex={onSetActiveItemIndex}
+              activeItemIndex={activeItemIndex}
+            />
           </Stack>
           <Stack gap="xs" my="xl" pt="xs">
             <Divider
@@ -50,7 +52,11 @@ export default function BuildTicketStep({
                 </Text>
               }
             />
-            <NewRepairFields onSetActiveRepairIndex={onSetActiveRepairIndex} activeItemIndex={activeItemIndex} activeRepairIndex={activeRepairIndex}/>
+            <NewRepairFields
+              onSetActiveRepairIndex={onSetActiveRepairIndex}
+              activeItemIndex={activeItemIndex}
+              activeRepairIndex={activeRepairIndex}
+            />
           </Stack>
           <Button type="button">{nextButtonLabel}</Button>
         </Paper>

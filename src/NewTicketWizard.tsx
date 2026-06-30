@@ -82,12 +82,12 @@ export default function NewTicketWizard() {
     },
   });
 
-//   const itemsIndex = form.values.ticket_info.items.length - 1;
-//   const itemPath = `ticket_info.items`;
-//   const repairsIndex =
-//     form.values.ticket_info.items[itemsIndex].repairs.length > 0
-//       ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
-//       : 0;
+  //   const itemsIndex = form.values.ticket_info.items.length - 1;
+  //   const itemPath = `ticket_info.items`;
+  //   const repairsIndex =
+  //     form.values.ticket_info.items[itemsIndex].repairs.length > 0
+  //       ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
+  //       : 0;
 
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
@@ -96,18 +96,18 @@ export default function NewTicketWizard() {
     setRepairs([...repairs, newRepair]);
   };
 
-//   const onSaveItemDetails = () => {
-//     console.log("HELLO onSaveItemDetails");
-//     const newItem = {
-//       item_type: form.values.ticket_info.items[itemsIndex].item_type,
-//       category: form.values.ticket_info.items[itemsIndex].category,
-//       repairs: [],
-//       item_id: crypto.randomUUID(),
-//     };
-//     console.log(newItem);
-//     form.insertListItem(`${itemPath}`, newItem);
-//     console.log("Items updated: ", form.values.ticket_info.items);
-//   };
+  //   const onSaveItemDetails = () => {
+  //     console.log("HELLO onSaveItemDetails");
+  //     const newItem = {
+  //       item_type: form.values.ticket_info.items[itemsIndex].item_type,
+  //       category: form.values.ticket_info.items[itemsIndex].category,
+  //       repairs: [],
+  //       item_id: crypto.randomUUID(),
+  //     };
+  //     console.log(newItem);
+  //     form.insertListItem(`${itemPath}`, newItem);
+  //     console.log("Items updated: ", form.values.ticket_info.items);
+  //   };
 
   const onSaveRepair = (repair: Repair) => {
     const updatedRepairs = [...repairs, repair];
@@ -147,12 +147,14 @@ export default function NewTicketWizard() {
 
   const onSubmitTicketPayload = () => form.values;
 
-  const onSetActiveItemIndex = () => setActiveItemIndex(activeItemIndex + 1);
-  const onSetActiveRepairIndex = () => setActiveRepairIndex(form.getValues().ticket_info.items[activeItemIndex].repairs.length);
+  const onSetActiveItemIndex = (prevIndex: number) =>
+    setActiveItemIndex(prevIndex + 1);
+  const onSetActiveRepairIndex = (prevIndex: number) =>
+    setActiveRepairIndex(prevIndex + 1);
 
-/*wah wah */
-  console.log("activeItemIndex", activeItemIndex)
-  console.log("items array", form.getValues().ticket_info.items)
+  /*wah wah */
+  console.log("activeItemIndex", activeItemIndex);
+  console.log("items array", form.getValues().ticket_info.items);
 
   const mainView = (active: number) => {
     switch (active) {

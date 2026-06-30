@@ -3,7 +3,7 @@ import { useNewTicketFormContext } from "./NewTicketFormContext";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 
 interface NewItemFieldsProps {
-  onSetActiveItemIndex: () => void;
+  onSetActiveItemIndex: (index: number) => void;
   activeItemIndex: number;
 }
 
@@ -12,7 +12,6 @@ export default function NewItemFields({
   activeItemIndex,
 }: NewItemFieldsProps) {
   const form = useNewTicketFormContext();
-
 
   const handleSaveItem = () => {
     const item = form.getValues().draftItem;
@@ -23,7 +22,7 @@ export default function NewItemFields({
       item_id: crypto.randomUUID(),
     };
     form.insertListItem("ticket_info.items", newItem);
-    onSetActiveItemIndex;
+    onSetActiveItemIndex(activeItemIndex);
     form.resetField("draftItem");
   };
 
@@ -47,7 +46,7 @@ export default function NewItemFields({
           key={form.key(`draftItem.note`)}
           {...form.getInputProps(`draftItem.note`)}
         />
-        <Button onClick={handleSaveItem}>Add Item</Button>
+        <Button onClick={() => handleSaveItem()}>Add Item</Button>
       </Group>
     </Stack>
   );

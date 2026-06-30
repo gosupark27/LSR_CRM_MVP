@@ -13,11 +13,11 @@ export default function NewRepairFields({
   onSetActiveRepairIndex,
 }: NewRepairFieldsProps) {
   const form = useNewTicketFormContext();
-  const repairPath = `drafItem.${activeItemIndex}.repairs.${activeRepairIndex}`;
+  // const repairPath = `drafItem.${activeItemIndex}.repairs.${activeRepairIndex}`;
 
   const handleAddRepair = () => {
     console.log("NewRepairFields activeItemIndex", activeItemIndex);
-    console.log("NewRepairFields Items prop", form.getValues().ticket_info.items[activeItemIndex].repairs);
+    console.log("NewRepairFields Items prop", form.getValues().ticket_info.items[activeItemIndex - 1].repairs);
     const newRepair: Repair = {
       rp_service: form.values.draftRepair.rp_service,
       note: form.values.draftRepair.note,
@@ -26,10 +26,10 @@ export default function NewRepairFields({
     };
 
     form.insertListItem(
-      `ticket_info.items.${activeItemIndex}.repairs`,
+      `ticket_info.items.${activeItemIndex - 1}.repairs`,
       newRepair,
     );
-    onSetActiveRepairIndex;
+    onSetActiveRepairIndex(activeRepairIndex);
     form.resetField('draftRepair');
   };
 
@@ -53,7 +53,7 @@ export default function NewRepairFields({
           key={form.key(`draftRepair.cost`)}
           {...form.getInputProps(`draftRepair.cost`)}
         />
-        <Button onClick={handleAddRepair}>Add Repair</Button>
+        <Button onClick={() => handleAddRepair()}>Add Repair</Button>
       </Group>
     </Stack>
   );
