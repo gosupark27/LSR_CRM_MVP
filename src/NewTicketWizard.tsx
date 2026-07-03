@@ -10,16 +10,8 @@ import {
   Center,
 } from "@mantine/core";
 import {
-  NewTicketInfo,
-  CustomerInfo,
-  DateInfo,
-  Item,
-  ItemDetails,
-  Repair,
-  TicketInfo,
-  PaymentInfo,
   createDefaultTicketPayload,
-  DraftTicketPayload,
+  DefaultTicketPayload,
 } from "./types.ts";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
@@ -34,21 +26,6 @@ import {
 export default function NewTicketWizard() {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const [activeRepairIndex, setActiveRepairIndex] = useState(0);
-
-  const [itemDetails, setItemDetails] = useState<ItemDetails | null>(null);
-  const [repairs, setRepairs] = useState<Repair[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
-  const [customerDetails, setCustomerDetails] = useState<CustomerInfo | null>(
-    null,
-  );
-  const [dateDetails, setDateDetails] = useState<DateInfo | null>(null);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentInfo | null>(
-    null,
-  );
-
-  const [createdTicketPayload, setCreatedTicketPayload] =
-    useState<TicketInfo | null>(null);
-
   const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
 
@@ -63,87 +40,26 @@ export default function NewTicketWizard() {
     setHighestStepVisited((hSC) => Math.max(hSC, highestStepVisited));
   };
 
-  const ticketPayload: NewTicketInfo = createDefaultTicketPayload();
+  const ticketPayload: DefaultTicketPayload = createDefaultTicketPayload();
+
+  const [isUrgent, setIsUrgent] = useState(false);
 
   const form = useNewTicketForm({
+    mode: 'uncontrolled',
     initialValues: {
       ...createDefaultTicketPayload(),
-      draftItem: {
-        item_type: "",
-        category: "",
-        note: "",
-        repairs: [],
-      },
-      draftRepair: {
-        rp_service: "",
-        note: "",
-        cost: "",
-      },
+      
     },
   });
 
-  //   const itemsIndex = form.values.ticket_info.items.length - 1;
-  //   const itemPath = `ticket_info.items`;
-  //   const repairsIndex =
-  //     form.values.ticket_info.items[itemsIndex].repairs.length > 0
-  //       ? form.values.ticket_info.items[itemsIndex].repairs.length - 1
-  //       : 0;
+  const handleIsUrgent = (isUrgent: boolean) => {
+    setIsUrgent(isUrgent);
+  }
+
+  form.watch('ticket_info.date_info.urgent', ({value} )=> handleIsUrgent(value))
 
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
-
-  const handleAddNewRepair = (newRepair: Repair) => {
-    setRepairs([...repairs, newRepair]);
-  };
-
-  //   const onSaveItemDetails = () => {
-  //     console.log("HELLO onSaveItemDetails");
-  //     const newItem = {
-  //       item_type: form.values.ticket_info.items[itemsIndex].item_type,
-  //       category: form.values.ticket_info.items[itemsIndex].category,
-  //       repairs: [],
-  //       item_id: crypto.randomUUID(),
-  //     };
-  //     console.log(newItem);
-  //     form.insertListItem(`${itemPath}`, newItem);
-  //     console.log("Items updated: ", form.values.ticket_info.items);
-  //   };
-
-  const onSaveRepair = (repair: Repair) => {
-    const updatedRepairs = [...repairs, repair];
-    setRepairs(updatedRepairs);
-    setItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.item_id === itemDetails?.item_id) {
-          return {
-            ...item,
-            repairs: updatedRepairs,
-          };
-        }
-        return item;
-      }),
-    );
-  };
-
-  const onSaveDateDetails = (dateDetail: DateInfo) => {
-    setDateDetails(dateDetail);
-  };
-
-  const handleAddItemToTicket = () => {
-    if (!itemDetails) {
-      return;
-    }
-
-    const completedItem: Item = {
-      ...itemDetails,
-      repairs,
-    };
-
-    setItems((prev) => [...prev, completedItem]);
-
-    setItemDetails(null);
-    setRepairs([]);
-  };
 
   const onSubmitTicketPayload = () => form.values;
 
@@ -151,10 +67,6 @@ export default function NewTicketWizard() {
     setActiveItemIndex(prevIndex + 1);
   const onSetActiveRepairIndex = (prevIndex: number) =>
     setActiveRepairIndex(prevIndex + 1);
-
-  /*wah wah */
-  console.log("activeItemIndex", activeItemIndex);
-  console.log("items array", form.getValues().ticket_info.items);
 
   const mainView = (active: number) => {
     switch (active) {
@@ -171,8 +83,7 @@ export default function NewTicketWizard() {
       case 1:
         return (
           <CustomerInfoStep
-            onSaveCustomerDetails={setCustomerDetails}
-            onSaveDateDetails={setDateDetails}
+            isUrgent={isUrgent}
             nextButtonLabel={getNextButtonLabel(active)}
           />
         );
@@ -194,12 +105,6 @@ export default function NewTicketWizard() {
     }
   };
 
-  //   const renderAsideView = () => {
-  //     return (
-  //         <LiveWorkOrder />
-  //     );
-  //   };
-
   const getNextButtonLabel = (active: number) => {
     switch (active) {
       case 0:
@@ -215,21 +120,10 @@ export default function NewTicketWizard() {
     }
   };
 
-  //   const onNextStep = (active: number) => {
-  //     switch (active) {
-  //       case 0:
-  //         return {
-  //           onSaveCustomerDetails: onSaveItemDetails,
-  //           onSaveDateDetails: onSave,
-  //         };
-  //     }
-  //   };
-
   return (
     <NewTicketFormProvider form={form}>
       <AppShell
         padding="md"
-        // component="form"
         header={{ height: 85 }}
         aside={{
           width: 200,
@@ -238,15 +132,6 @@ export default function NewTicketWizard() {
       >
         <AppShell.Header>
           <Flex my="md" p="sm">
-            {/* DEBUG: Show current state */}
-            {/* <div style={{ marginTop: '20px', padding: '10px', border: '1px solid red' }}>
-                    <Text fw={700}>DEBUG STATE:</Text>
-                    <Text>itemDetails: {JSON.stringify(itemDetails)}</Text>
-                    <Text>repairs: {JSON.stringify(repairs)}</Text>
-                    <Text>items count: {items.length}</Text>
-                    <Text>customerDetails: {JSON.stringify(customerDetails)}</Text>
-                    <Text>dateDetails: {JSON.stringify(dateDetails)}</Text>
-                    </div> */}
             <Stepper active={active} onStepClick={setActive}>
               <Stepper.Step
                 label="Build Ticket"
