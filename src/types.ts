@@ -21,6 +21,19 @@ export interface TicketInfo {
   items: Item[];
 }
 
+interface DraftItem {
+  item_type: string;
+  category: string;
+  note: string;
+  repairs: DraftRepair[];
+}
+
+interface DraftRepair {
+  rp_service: string;
+  note: string;
+  cost: string;
+}
+
 export type DateInfo = {
   dropoff_date: string | null;
   pickup_date: string | null;
@@ -56,21 +69,11 @@ export type RepairFormValues = {
   repairs: Repair[];
 };
 
-export type DraftTicketPayload = NewTicketInfo & {
-    draftItem: {
-        item_type: '',
-        category: '',
-        note: '',
-        repairs: []
-    },
-    draftRepair: {
-        rp_service: '',
-        note: '',
-        cost: ''
-    }
-}
+export type DefaultTicketPayload = NewTicketInfo & {
+  draftItem: DraftItem,
+};
 
-export const createDefaultTicketPayload = (): NewTicketInfo => ({
+export const createDefaultTicketPayload = (): DefaultTicketPayload => ({
   customer_info: {
     first_name: "",
     last_name: "",
@@ -78,7 +81,7 @@ export const createDefaultTicketPayload = (): NewTicketInfo => ({
     email: "",
   },
   ticket_info: {
-    ticket_status: 'received',
+    ticket_status: "received",
     date_info: {
       dropoff_date: null,
       pickup_date: null,
@@ -89,6 +92,12 @@ export const createDefaultTicketPayload = (): NewTicketInfo => ({
       deposit: "",
       balance: "",
     },
-    items:[],
+    items: [],
   },
+  draftItem: {
+    item_type: "",
+    category: "",
+    note: "",
+    repairs: [],
+  }
 });

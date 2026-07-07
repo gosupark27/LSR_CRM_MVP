@@ -1,28 +1,35 @@
-import { Button } from "@mantine/core";
-import NewCustomerForm from "./NewCustomerForm";
-import NewScheduleForm from "./NewScheduleForm";
+import { Button, Divider, Text } from "@mantine/core";
+import NewCustomerFields from "./NewCustomerFields";
 import { CustomerInfo, DateInfo } from "./types";
+import NewScheduleFields from "./NewScheduleFields";
 
 interface CustomerInfoStepProps {
-  onSaveCustomerDetails: (customerDetails: CustomerInfo) => void;
-  onSaveDateDetails: (datDetails: DateInfo) => void;
+  isUrgent: boolean;
   nextButtonLabel: string;
 }
 
 export default function CustomerInfoStep({
-  onSaveCustomerDetails,
-  onSaveDateDetails,
+  isUrgent,
   nextButtonLabel,
 }: CustomerInfoStepProps) {
-    const onSaveCustomerInfo = () => {
-        
-    }
-
-
   return (
     <>
-      <NewCustomerForm onSaveCustomerDetails={onSaveCustomerDetails} />
-      <NewScheduleForm onSaveDateDetails={onSaveDateDetails} />
+      <Divider
+        label={
+          <Text tt="uppercase" fw={500}>
+            Contact Details
+          </Text>
+        }
+      />
+      <NewCustomerFields />
+      <Divider
+        label={
+          <Text tt="uppercase" fw={500}>
+            Select pickup date
+          </Text>
+        }
+      />
+      <NewScheduleFields isUrgent={isUrgent} />
       <Button type="submit">{nextButtonLabel}</Button>
     </>
   );

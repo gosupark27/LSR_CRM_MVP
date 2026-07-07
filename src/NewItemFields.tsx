@@ -146,7 +146,7 @@ export default function NewItemFields({
               rightSection={<Combobox.Chevron />}
               rightSectionPointerEvents="none"
               onClick={() => combobox.openDropdown()}
-              key="drafItem.item_type"
+              key={form.key('draftItem.item_type')}
             >
               {form.values.draftItem.item_type || (
                 <Input.Placeholder>Select Item</Input.Placeholder>

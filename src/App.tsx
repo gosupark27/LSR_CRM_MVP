@@ -1,7 +1,7 @@
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { theme } from "./theme";
-import TicketSearch from "./TicketSearch"
 import NewTicketWizard from "./NewTicketWizard";
 
 
