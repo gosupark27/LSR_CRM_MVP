@@ -2,7 +2,7 @@ type Status = "received" | "in_progress" | "ready_for_pickup" | "picked_up";
 
 export interface NewTicketInfo {
   customer_info: CustomerInfo;
-  ticket_info: TicketInfo;
+  ticket_info: Omit<TicketInfo, 'items'> & {items: DraftItem[]};
 }
 
 export interface CustomerInfo {
@@ -21,14 +21,14 @@ export interface TicketInfo {
   items: Item[];
 }
 
-interface DraftItem {
+export interface DraftItem {
   item_type: string;
   category: string;
   note: string;
   repairs: DraftRepair[];
 }
 
-interface DraftRepair {
+export interface DraftRepair {
   rp_service: string;
   note: string;
   cost: string;
@@ -69,11 +69,7 @@ export type RepairFormValues = {
   repairs: Repair[];
 };
 
-export type DefaultTicketPayload = NewTicketInfo & {
-  draftItem: DraftItem,
-};
-
-export const createDefaultTicketPayload = (): DefaultTicketPayload => ({
+export const NewTicketPayload = (): NewTicketInfo => ({
   customer_info: {
     first_name: "",
     last_name: "",
@@ -93,11 +89,5 @@ export const createDefaultTicketPayload = (): DefaultTicketPayload => ({
       balance: "",
     },
     items: [],
-  },
-  draftItem: {
-    item_type: "",
-    category: "",
-    note: "",
-    repairs: [],
   }
 });

@@ -19,14 +19,20 @@ import {
   PuzzlePieceIcon,
   Icon,
 } from "@phosphor-icons/react";
+import { DraftItem } from "./types";
+import { useRef } from "react";
 
 interface NewItemFieldsProps {
   onSetActiveItemIndex: (index: number) => void;
+  setDraftItem: (item: DraftItem) => void;
+  draftItem: DraftItem;
   activeItemIndex: number;
 }
 
 export default function NewItemFields({
   onSetActiveItemIndex,
+  setDraftItem,
+  draftItem,
   activeItemIndex,
 }: NewItemFieldsProps) {
   const form = useNewTicketFormContext();
@@ -34,6 +40,8 @@ export default function NewItemFields({
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
+
+  const noteRef = useRef<HTMLInputElement>(null);
 
   const itemTypes = [
     { value: "Golf Bag", label: "Golf Bag", category: "others" },
@@ -111,18 +119,29 @@ export default function NewItemFields({
     return categoryOrder.indexOf(categoryA) - categoryOrder.indexOf(categoryB);
   });
 
-  const handleSaveItem = () => {
-    const item = form.getValues().draftItem;
-    const newItem = {
-      item_type: item.item_type,
-      category: item.category,
-      note: item.note,
-      repairs: [],
-      item_id: crypto.randomUUID(),
-    };
-    form.insertListItem("ticket_info.items", newItem);
-    onSetActiveItemIndex(activeItemIndex);
-    form.resetField("draftItem");
+  // const handleSaveItem = () => {
+  //   const item = form.getValues().draftItem;
+  //   const newItem = {
+  //     item_type: item.item_type,
+  //     category: item.category,
+  //     note: item.note,
+  //     repairs: [],
+  //     item_id: crypto.randomUUID(),
+  //   };
+  //   form.insertListItem("ticket_info.items", newItem);
+  //   onSetActiveItemIndex(activeItemIndex);
+  //   form.resetField("draftItem");
+  // };
+
+  const handleNoteField = () => {
+    draftItem.note = noteRef.current?.value ?? "";
+    setDraftItem(draftItem);
+  };
+
+  const handleDraftItem = (val: string, category: string) => {
+    draftItem.category = category;
+    draftItem.item_type = val;
+    setDraftItem(draftItem);
   };
 
   return (
@@ -131,9 +150,10 @@ export default function NewItemFields({
         <Combobox
           store={combobox}
           onOptionSubmit={(val, optionProps) => {
-            const category = (optionProps as any)["data-category"]
-            form.setFieldValue("draftItem.item_type", val);
-            form.setFieldValue("draftItem.category", category);
+            const category = (optionProps as any)["data-category"];
+            handleDraftItem(val, category);
+            // form.setFieldValue("draftItem.item_type", val);
+            // form.setFieldValue("draftItem.category", category);
             combobox.closeDropdown();
           }}
         >
@@ -146,9 +166,9 @@ export default function NewItemFields({
               rightSection={<Combobox.Chevron />}
               rightSectionPointerEvents="none"
               onClick={() => combobox.openDropdown()}
-              key={form.key('draftItem.item_type')}
+              // key={form.key('draftItem.item_type')}
             >
-              {form.values.draftItem.item_type || (
+              {draftItem.item_type || (
                 <Input.Placeholder>Select Item</Input.Placeholder>
               )}
             </InputBase>
@@ -192,11 +212,13 @@ export default function NewItemFields({
       </Group>
       <Group wrap="nowrap" justify="space-between" align="flex-end">
         <TextInput
+          ref={noteRef}
           label="Note"
-          key={form.key(`draftItem.note`)}
-          {...form.getInputProps(`draftItem.note`)}
+          onBlur={() => handleNoteField()}
+          // key={form.key(`draftItem.note`)}
+          // {...form.getInputProps(`draftItem.note`)}
         />
-        <Button onClick={() => handleSaveItem()}>Add Item</Button>
+        {/* <Button onClick={() => handleSaveItem()}>Add Item</Button> */}
       </Group>
     </Stack>
   );

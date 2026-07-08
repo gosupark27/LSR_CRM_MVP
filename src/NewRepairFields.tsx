@@ -7,16 +7,20 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
-import { Repair } from "./types";
+import { DraftItem, DraftRepair, Repair } from "./types";
 import { useId } from "@mantine/hooks";
 
 interface NewRepairFieldsProps {
   onSetActiveRepairIndex: (index: number) => void;
+  setDraftRepairs: (repairs: DraftRepair[]) => void;
+  draftItem: DraftItem;
   activeItemIndex: number;
   activeRepairIndex: number;
 }
 export default function NewRepairFields({
   activeItemIndex,
+  setDraftRepairs,
+  draftItem,
   activeRepairIndex,
   onSetActiveRepairIndex,
 }: NewRepairFieldsProps) {
@@ -44,10 +48,10 @@ export default function NewRepairFields({
 
   const groupedByCategory = Object.groupBy(
     repairs,
-    (repair) => form.getValues().ticket_info.items[activeItemIndex]?.category,
+    (repair) => repair.category,
   );
   const repairData = Object.entries(groupedByCategory)
-    .filter(([group]) => group === form.getValues().draftItem.category)
+    .filter(([group]) => group === draftItem.category)
     .flatMap(([group, items]) =>
       items
         ? items.map((item) => ({
@@ -59,7 +63,7 @@ export default function NewRepairFields({
 
   const handleOnChange = (value: string[]) => {
     const prevDraftRepairs =
-      form.getValues().ticket_info.items[activeItemIndex].repairs;
+      draftItem.repairs;
     const newDraftRepairs = value.map((newRepair) => {
       const existingRepairIndex = prevDraftRepairs?.findIndex(
         (prevRepair) => prevRepair.rp_service === newRepair,
@@ -73,24 +77,17 @@ export default function NewRepairFields({
         cost: "",
       };
     });
-
-    form.setFieldValue(
-      `ticket_info.items.${activeItemIndex}.repairs`,
-      newDraftRepairs,
-    );
+    draftItem.repairs = newDraftRepairs;
+    setDraftRepairs(draftItem.repairs)
+    // form.setFieldValue(
+    //   `ticket_info.items.${activeItemIndex}.repairs`,
+    //   newDraftRepairs,
+    // );
   };
 
-  const handleValue = () => {
-    return form
-      .getValues()
-      .ticket_info.items[
-        activeItemIndex
-      ]?.repairs?.map((draftRepair) => draftRepair.rp_service) ?? [] as string[];
-  };
+  const handleValue = () => draftItem.repairs.map((repair) => repair.rp_service);
 
-  const renderRepairTable = form
-    .getValues()
-    .ticket_info.items[activeItemIndex]?.repairs.map((repair, index) => {
+  const renderRepairTable = draftItem.repairs.map((repair, index) => {
       const uuid = useId();
 
       return (

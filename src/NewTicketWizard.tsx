@@ -10,8 +10,10 @@ import {
   Center,
 } from "@mantine/core";
 import {
-  createDefaultTicketPayload,
-  DefaultTicketPayload,
+  NewTicketPayload,
+  DraftItem,
+  DraftRepair,
+  NewTicketInfo,
 } from "./types.ts";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
@@ -29,6 +31,39 @@ export default function NewTicketWizard() {
   const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
 
+  const [isUrgent, setIsUrgent] = useState(false);
+
+  const form = useNewTicketForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      ...NewTicketPayload(),
+    },
+  });
+
+  const handleIsUrgent = (isUrgent: boolean) => {
+    setIsUrgent(isUrgent);
+  }
+
+  form.watch('ticket_info.date_info.urgent', ({value} )=> handleIsUrgent(value))
+
+  const initDraftItem: DraftItem = {
+    category: '',
+    item_type: '',
+    note: '',
+    repairs: []
+  };
+
+
+  const [draftItem, setDraftItem] = useState<DraftItem>(initDraftItem);
+  const [draftRepairs, setDraftRepairs] = useState<DraftRepair []>(initDraftItem.repairs);
+
+  const handleDraftItem = (item : DraftItem) => setDraftItem(item);
+  const handleDraftRepairs = (repairs : DraftRepair[]) => setDraftRepairs(repairs);
+
+  const handleAddNewTab = () => {
+    form.insertListItem('ticket_info.items', draftItem);
+  }
+
   const handleStepChange = (nextStep: number) => {
     const isOutofBounds = nextStep > 4 || nextStep < 0;
 
@@ -40,23 +75,9 @@ export default function NewTicketWizard() {
     setHighestStepVisited((hSC) => Math.max(hSC, highestStepVisited));
   };
 
-  const ticketPayload: DefaultTicketPayload = createDefaultTicketPayload();
+  const ticketPayload: NewTicketInfo = NewTicketPayload();
 
-  const [isUrgent, setIsUrgent] = useState(false);
-
-  const form = useNewTicketForm({
-    mode: 'uncontrolled',
-    initialValues: {
-      ...createDefaultTicketPayload(),
-      
-    },
-  });
-
-  const handleIsUrgent = (isUrgent: boolean) => {
-    setIsUrgent(isUrgent);
-  }
-
-  form.watch('ticket_info.date_info.urgent', ({value} )=> handleIsUrgent(value))
+  
 
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
@@ -77,6 +98,11 @@ export default function NewTicketWizard() {
             onSetActiveItemIndex={onSetActiveItemIndex}
             activeRepairIndex={activeRepairIndex}
             onSetActiveRepairIndex={onSetActiveRepairIndex}
+            setDraftItem={handleDraftItem}
+            setDraftRepairs={handleDraftRepairs}
+            draftRepairs={draftRepairs}
+            draftItem={draftItem}
+            handleAddNewTab={handleAddNewTab}
             nextButtonLabel={getNextButtonLabel(active)}
           />
         );
