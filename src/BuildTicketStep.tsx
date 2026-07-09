@@ -38,9 +38,9 @@ export default function BuildTicketStep({
   activeRepairIndex,
   activeItemIndex,
 }: BuildTicketStepProps) {
-  const itemTabs = [];
   const infoIcon = <InfoIcon size={16} />;
-  const renderItemRepairFields = () => (
+  
+  const renderFields = () => (
     <Box>
       <Container>
         <Paper p="lg" shadow="sm" my="lg">
@@ -83,23 +83,49 @@ export default function BuildTicketStep({
     </Box>
   );
 
-  const defaultTab = (
-    <Tabs.Tab
-      leftSection={infoIcon}
-      value={String(itemTabs.length)}
-      key={itemTabs.length}
-    >
-      Add New Item
-      {renderItemRepairFields()}
-    </Tabs.Tab>
-  );
-  itemTabs.push(defaultTab);
+  const defaultTabsConfig = {
+    id: crypto.randomUUID(),
+    icon: infoIcon,
+    label: "New Item",
+    content: renderFields(),
+  }
+  const itemTabs: typeof defaultTabsConfig[] = [defaultTabsConfig];
 
-  const renderTabList = itemTabs.map((tab) => tab);
+  // const defaultTab = (
+  //   <Tabs.Tab
+  //     leftSection={infoIcon}
+  //     value={String(itemTabs.length)}
+  //     key={itemTabs.length}
+  //   >
+  //     Add New Item
+  //     {renderFields()}
+  //   </Tabs.Tab>
+  // );
+  // itemTabs.push(defaultTab);
+
+  const renderTabList = itemTabs.map((tab) => (
+    <Tabs.Tab
+      leftSection={tab.icon}
+      value={tab.id}
+      key={tab.id}
+    >
+      {tab.label}
+    </Tabs.Tab>
+  ));
+  const renderTabsPanel = itemTabs.map((tab) =>(
+    <Tabs.Panel
+      value={tab.id}
+      key={tab.id}
+      children={tab.content}
+    >
+
+    </Tabs.Panel>
+  ))
 
   return (
-    <Tabs>
+    <Tabs defaultValue={itemTabs?.[0].id}>
       <Tabs.List>{renderTabList}</Tabs.List>
+      {renderTabsPanel}
     </Tabs>
   );
 }
