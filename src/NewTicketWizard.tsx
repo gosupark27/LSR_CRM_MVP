@@ -72,6 +72,8 @@ export default function NewTicketWizard() {
 
   const handleAddNewTab = () => {
     form.insertListItem('ticket_info.items', draftItem);
+    form.setFieldValue('ticket_info.items', form.getValues().ticket_info.items);
+    setDraftItem(initDraftItem);
   }
 
   const handleStepChange = (nextStep: number) => {

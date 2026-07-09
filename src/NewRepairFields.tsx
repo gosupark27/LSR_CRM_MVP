@@ -8,11 +8,12 @@ import {
 } from "@mantine/core";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
 import { DraftItem, DraftRepair, Repair } from "./types";
-import { useId } from "@mantine/hooks";
 
 interface NewRepairFieldsProps {
   onSetActiveRepairIndex: (index: number) => void;
   setDraftRepairs: (repairs: DraftRepair[]) => void;
+  isDisabled: boolean;
+  isResetRepairs: boolean;
   draftItem: DraftItem;
   activeItemIndex: number;
   activeRepairIndex: number;
@@ -21,6 +22,8 @@ export default function NewRepairFields({
   activeItemIndex,
   setDraftRepairs,
   draftItem,
+  isDisabled,
+  isResetRepairs,
   activeRepairIndex,
   onSetActiveRepairIndex,
 }: NewRepairFieldsProps) {
@@ -62,8 +65,7 @@ export default function NewRepairFields({
     );
 
   const handleOnChange = (value: string[]) => {
-    const prevDraftRepairs =
-      draftItem.repairs;
+    const prevDraftRepairs = draftItem.repairs;
     const newDraftRepairs = value.map((newRepair) => {
       const existingRepairIndex = prevDraftRepairs?.findIndex(
         (prevRepair) => prevRepair.rp_service === newRepair,
@@ -75,87 +77,73 @@ export default function NewRepairFields({
         rp_service: newRepair,
         note: "",
         cost: "",
+        repair_id: crypto.randomUUID(),
       };
     });
     draftItem.repairs = newDraftRepairs;
-    setDraftRepairs(draftItem.repairs)
-    // form.setFieldValue(
-    //   `ticket_info.items.${activeItemIndex}.repairs`,
-    //   newDraftRepairs,
-    // );
+    setDraftRepairs(draftItem.repairs);
+  };
+  const handleNote = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    draftItem.repairs[index].note = e.currentTarget.value;
+
+  };
+  const handleCost = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    draftItem.repairs[index].cost = e.currentTarget.value;
   };
 
-  const handleValue = () => draftItem.repairs.map((repair) => repair.rp_service);
+  const handleValue = () => {
+    const penis: string[] = draftItem.repairs?.map((repair) => repair.rp_service);
+    console.log(penis, typeof penis)
+    console.log(draftItem.category)
+    return penis
+  };
 
-  const renderRepairTable = draftItem.repairs.map((repair, index) => {
-      const uuid = useId();
+  const selectedValues = draftItem.repairs?.map((repair) => repair.rp_service) || [];
 
-      return (
-        <Table.Tr key={uuid}>
-          <Table.Td>{repair.rp_service}</Table.Td>
-          <Table.Td>
-            <TextInput
-              placeholder="Repair Note"
-              key={form.key(
-                `ticket_info.items.${activeItemIndex}.repairs.${index}.note`,
-              )}
-              {...form.getInputProps(
-                `ticket_info.items.${activeItemIndex}.repairs.${index}.note`,
-              )}
-            ></TextInput>
-          </Table.Td>
-          <Table.Td>
-            <TextInput
-              placeholder="Repair Cost"
-              key={form.key(
-                `ticket_info.items.${activeItemIndex}.repairs.${index}.cost`,
-              )}
-              {...form.getInputProps(
-                `ticket_info.items.${activeItemIndex}.repairs.${index}.cost`,
-              )}
-            ></TextInput>
-          </Table.Td>
-        </Table.Tr>
-      );
-    });
+  const renderRepairTable = draftItem.repairs?.map((repair, index) => {
+    return (
+      <Table.Tr key={repair.repair_id}>
+        <Table.Td>{repair.rp_service}</Table.Td>
+        <Table.Td>
+          <TextInput
+            placeholder="Repair Note"
+            key={draftItem.repairs[index].repair_id}
+            onChange={(e) => handleNote(e, index)}
+          ></TextInput>
+        </Table.Td>
+        <Table.Td>
+          <TextInput
+            placeholder="Repair Cost"
+            key={draftItem.repairs[index].repair_id}
+            onChange={(e) => handleCost(e, index)}
+          ></TextInput>
+        </Table.Td>
+      </Table.Tr>
+    );
+  });
 
-  // const handleAddRepair = () => {
-  //   console.log("NewRepairFields activeItemIndex", activeItemIndex);
-  //   console.log(
-  //     "NewRepairFields Items prop",
-  //     form.getValues().ticket_info.items[activeItemIndex - 1].repairs,
-  //   );
-  //   const newRepair: Repair = {
-  //     rp_service: form.values.draftRepair.rp_service,
-  //     note: form.values.draftRepair.note,
-  //     cost: form.values.draftRepair.cost,
-  //     repair_id: crypto.randomUUID(),
-  //   };
-
-  //   form.insertListItem(
-  //     `ticket_info.items.${activeItemIndex - 1}.repairs`,
-  //     newRepair,
-  //   );
-  //   onSetActiveRepairIndex(activeRepairIndex);
-  //   form.resetField("draftRepair");
-  // };
+  if (isResetRepairs) {
+    handleValue();
+    console.log('new item, new repairs aka EMPTY array')
+    return renderRepairTable;
+  }
 
   return (
     <Stack>
       <Group wrap="nowrap" justify="flex-start">
-        {/* <TextInput
-          label="Repair Service"
-          key={form.key(`draftRepair.rp_service`)}
-          {...form.getInputProps(`draftRepair.rp_service`)}
-        /> */}
         <MultiSelect
           placeholder="Select repairs"
           w="100%"
+          disabled={isDisabled}
           data={repairData}
-          key={form.key(`ticket_info.items.${activeItemIndex}.repairs`)}
-          value={handleValue()}
+          value={selectedValues}
           onChange={(value) => handleOnChange(value)}
-          {...restInputProps}
         />
       </Group>
       <Table>
@@ -169,21 +157,6 @@ export default function NewRepairFields({
         </Table.Thead>
         <Table.Tbody>{renderRepairTable}</Table.Tbody>
       </Table>
-      {/* <Group wrap="nowrap" justify="space-between" align="flex-end">
-        <Group wrap="nowrap" justify="space-between" align="flex-end">
-          <TextInput
-            label="Cost"
-            key={form.key(`draftRepair.cost`)}
-            {...form.getInputProps(`draftRepair.cost`)}
-          />
-          <TextInput
-            label="Note"
-            key={form.key(`draftRepair.note`)}
-            {...form.getInputProps(`draftRepair.note`)}
-          />
-        </Group>
-        <Button onClick={() => handleAddRepair()}>Add Repair</Button>
-      </Group> */}
     </Stack>
   );
 }

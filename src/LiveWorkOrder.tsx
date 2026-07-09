@@ -36,7 +36,7 @@ export default function LiveWorkOrder() {
 
   const renderLiveWorkOrder = () =>
     items.map((item: DraftItem, index: number) => (
-      <Accordion.Item key={item.item_type + item.category} value={item.item_type + item.category}>
+      <Accordion.Item key={item.item_id} value={item.item_id?.toString() ?? ''}>
         <Accordion.Control>
           <Stack justify="center" align="stretch">
             <Text fw={500} tt="uppercase" fz="lg">

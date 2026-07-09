@@ -24,14 +24,17 @@ export interface TicketInfo {
 export interface DraftItem {
   item_type: string;
   category: string;
+  categoryIcon?: React.JSX.Element
   note: string;
   repairs: DraftRepair[];
+  item_id?: string | undefined;
 }
 
 export interface DraftRepair {
   rp_service: string;
   note: string;
   cost: string;
+  repair_id?: string;
 }
 
 export type DateInfo = {
@@ -58,7 +61,7 @@ export type Item = {
 export type ItemDetails = Omit<Item, "repairs">;
 
 export type Repair = {
-  repair_id?: string | number;
+  repair_id: string | number;
   item_id?: string | number;
   rp_service: string;
   note: string;

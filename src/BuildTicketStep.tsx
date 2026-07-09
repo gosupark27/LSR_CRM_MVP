@@ -12,6 +12,8 @@ import { InfoIcon } from "@phosphor-icons/react";
 import NewItemFields from "./NewItemFields";
 import NewRepairFields from "./NewRepairFields";
 import { DefaultTabsConfig, DraftItem, DraftRepair } from "./types";
+import { useState } from "react";
+import { useNewTicketFormContext } from "./NewTicketFormContext";
 
 interface BuildTicketStepProps {
   onSetActiveItemIndex: (index: number) => void;
@@ -42,7 +44,14 @@ export default function BuildTicketStep({
   activeRepairIndex,
   activeItemIndex,
 }: BuildTicketStepProps) {
-  const infoIcon = <InfoIcon size={16} />;
+  const form = useNewTicketFormContext();
+  const [isDisabled, setIsDisabled] = useState<boolean>(draftItem.item_type === '');
+  const handleIsDisabled = () => {
+    setIsDisabled(draftItem.item_type === '');
+  };
+  const [isResetRepairs, setIsResetRepairs] = useState(false)
+  const handleIsResetRepairs = () => setIsResetRepairs(draftItem.repairs.length === 0);
+  const tabIcon = draftItem.categoryIcon || <InfoIcon size={16} />;
   const renderFields = () => (
     <Box>
       <Container>
@@ -57,8 +66,10 @@ export default function BuildTicketStep({
               }
             />
             <NewItemFields
-              onSetActiveItemIndex={onSetActiveItemIndex}
+              setDraftRepairs={setDraftRepairs}
               setDraftItem={setDraftItem}
+              setIsDisabled={handleIsDisabled}
+              setIsResetRepairs={handleIsResetRepairs}
               draftItem={draftItem}
               activeItemIndex={activeItemIndex}
             />
@@ -76,11 +87,13 @@ export default function BuildTicketStep({
               onSetActiveRepairIndex={onSetActiveRepairIndex}
               setDraftRepairs={setDraftRepairs}
               draftItem={draftItem}
+              isDisabled={isDisabled}
+              isResetRepairs={isResetRepairs}
               activeItemIndex={activeItemIndex}
               activeRepairIndex={activeRepairIndex}
             />
           </Stack>
-          <Button type="button" onClick={() => test()} >{/*nextButtonLabel*/}Add New Item</Button>
+          <Button type="button" disabled={draftItem.repairs.length === 0} onClick={() => test()} >{/*nextButtonLabel*/}Add New Item</Button>
         </Paper>
       </Container>
     </Box>
@@ -93,12 +106,12 @@ export default function BuildTicketStep({
   const test = () => {
     const newItemTab = {
     id: crypto.randomUUID(),
-    icon: infoIcon,
-    label: "New Item",
+    icon: tabIcon,
+    label: draftItem.item_type || "New Item",
     content: renderFields(),
   }
    setItemTabs([...itemTabs, newItemTab]);
-   console.log(itemTabs);
+   handleAddNewTab()
   };
 
   // const defaultTab = (
@@ -133,7 +146,10 @@ export default function BuildTicketStep({
   ))
 
   return (
-    <Tabs defaultValue={itemTabs?.[0].id}>
+    <Tabs 
+      defaultValue={itemTabs?.[0].id}
+      value={draftItem.item_id || itemTabs?.[0].id}
+    >
       <Tabs.List>{renderTabList}</Tabs.List>
       {renderTabsPanel}
     </Tabs>

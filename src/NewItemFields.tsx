@@ -1,4 +1,3 @@
-import { useNewTicketFormContext } from "./NewTicketFormContext";
 import {
   Button,
   Combobox,
@@ -19,24 +18,26 @@ import {
   PuzzlePieceIcon,
   Icon,
 } from "@phosphor-icons/react";
-import { DraftItem } from "./types";
+import { DraftItem, DraftRepair } from "./types";
 import { useRef } from "react";
 
 interface NewItemFieldsProps {
-  onSetActiveItemIndex: (index: number) => void;
+  setDraftRepairs: (repairs: DraftRepair[]) => void;
   setDraftItem: (item: DraftItem) => void;
+  setIsDisabled: () => void;
+  setIsResetRepairs: () => void;
   draftItem: DraftItem;
   activeItemIndex: number;
 }
 
 export default function NewItemFields({
-  onSetActiveItemIndex,
+  setDraftRepairs,
   setDraftItem,
   draftItem,
+  setIsDisabled,
+  setIsResetRepairs,
   activeItemIndex,
 }: NewItemFieldsProps) {
-  const form = useNewTicketFormContext();
-
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -119,20 +120,6 @@ export default function NewItemFields({
     return categoryOrder.indexOf(categoryA) - categoryOrder.indexOf(categoryB);
   });
 
-  // const handleSaveItem = () => {
-  //   const item = form.getValues().draftItem;
-  //   const newItem = {
-  //     item_type: item.item_type,
-  //     category: item.category,
-  //     note: item.note,
-  //     repairs: [],
-  //     item_id: crypto.randomUUID(),
-  //   };
-  //   form.insertListItem("ticket_info.items", newItem);
-  //   onSetActiveItemIndex(activeItemIndex);
-  //   form.resetField("draftItem");
-  // };
-
   const handleNoteField = () => {
     draftItem.note = noteRef.current?.value ?? "";
     setDraftItem(draftItem);
@@ -140,8 +127,31 @@ export default function NewItemFields({
 
   const handleDraftItem = (val: string, category: string) => {
     draftItem.category = category;
+    const IconComponent = categoryLabels[category];
+    draftItem.categoryIcon = (
+      <IconComponent size={16} style={{ display: "block" }} />
+    );
     draftItem.item_type = val;
+    draftItem.item_id =
+      draftItem.item_id === undefined ? crypto.randomUUID() : draftItem.item_id;
+    if (draftItem.repairs.length !== 0) {
+      draftItem.repairs = [];
+      // console.log('diff item bitch')
+      // console.log(draftItem.repairs.length)
+      // const initDraftRepair = {
+      //   rp_service: null,
+      //   note: "",
+      //   cost: "",
+      // }
+      // draftItem.repairs?.push(initDraftRepair)
+      // setDraftRepairs(draftItem.repairs)
+      setDraftItem(draftItem);
+      console.log(draftItem);
+      setIsResetRepairs();
+    }
+    console.log(draftItem)
     setDraftItem(draftItem);
+    setIsDisabled();
   };
 
   return (
@@ -152,8 +162,6 @@ export default function NewItemFields({
           onOptionSubmit={(val, optionProps) => {
             const category = (optionProps as any)["data-category"];
             handleDraftItem(val, category);
-            // form.setFieldValue("draftItem.item_type", val);
-            // form.setFieldValue("draftItem.category", category);
             combobox.closeDropdown();
           }}
         >
@@ -166,7 +174,6 @@ export default function NewItemFields({
               rightSection={<Combobox.Chevron />}
               rightSectionPointerEvents="none"
               onClick={() => combobox.openDropdown()}
-              // key={form.key('draftItem.item_type')}
             >
               {draftItem.item_type || (
                 <Input.Placeholder>Select Item</Input.Placeholder>
@@ -215,10 +222,7 @@ export default function NewItemFields({
           ref={noteRef}
           label="Note"
           onBlur={() => handleNoteField()}
-          // key={form.key(`draftItem.note`)}
-          // {...form.getInputProps(`draftItem.note`)}
         />
-        {/* <Button onClick={() => handleSaveItem()}>Add Item</Button> */}
       </Group>
     </Stack>
   );
