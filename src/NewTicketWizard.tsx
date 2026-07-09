@@ -14,6 +14,7 @@ import {
   DraftItem,
   DraftRepair,
   NewTicketInfo,
+  DefaultTabsConfig,
 } from "./types.ts";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
@@ -24,12 +25,21 @@ import {
   NewTicketFormProvider,
   useNewTicketForm,
 } from "./NewTicketFormContext.ts";
+import { InfoIcon } from "@phosphor-icons/react";
 
 export default function NewTicketWizard() {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const [activeRepairIndex, setActiveRepairIndex] = useState(0);
   const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
+  
+  const infoIcon = <InfoIcon size={16} />;
+  const defaultTabsConfig: DefaultTabsConfig = {
+    id: crypto.randomUUID(),
+    icon: infoIcon,
+    label: "New Item",
+  }
+  const [itemTabs, setItemTabs] = useState<DefaultTabsConfig[]>([defaultTabsConfig]);
 
   const [isUrgent, setIsUrgent] = useState(false);
 
@@ -102,6 +112,8 @@ export default function NewTicketWizard() {
             setDraftRepairs={handleDraftRepairs}
             draftRepairs={draftRepairs}
             draftItem={draftItem}
+            itemTabs={itemTabs}
+            setItemTabs={setItemTabs}
             handleAddNewTab={handleAddNewTab}
             nextButtonLabel={getNextButtonLabel(active)}
           />

@@ -69,6 +69,14 @@ export type RepairFormValues = {
   repairs: Repair[];
 };
 
+export type DefaultTabsConfig = {
+    id: string;
+    icon: React.JSX.Element;
+    label: string;
+    content?: React.JSX.Element;
+
+}
+
 export const NewTicketPayload = (): NewTicketInfo => ({
   customer_info: {
     first_name: "",

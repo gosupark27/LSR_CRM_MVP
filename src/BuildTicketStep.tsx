@@ -11,7 +11,7 @@ import {
 import { InfoIcon } from "@phosphor-icons/react";
 import NewItemFields from "./NewItemFields";
 import NewRepairFields from "./NewRepairFields";
-import { DraftItem, DraftRepair } from "./types";
+import { DefaultTabsConfig, DraftItem, DraftRepair } from "./types";
 
 interface BuildTicketStepProps {
   onSetActiveItemIndex: (index: number) => void;
@@ -19,6 +19,8 @@ interface BuildTicketStepProps {
   setDraftItem: (item: DraftItem) => void;
   draftItem: DraftItem;
   setDraftRepairs: (repairs: DraftRepair[]) => void;
+  itemTabs: DefaultTabsConfig[];
+  setItemTabs: (itemTabs: DefaultTabsConfig[]) => void;
   handleAddNewTab: () => void;
   draftRepairs: DraftRepair[];
   nextButtonLabel: string;
@@ -32,6 +34,8 @@ export default function BuildTicketStep({
   setDraftItem,
   draftItem,
   setDraftRepairs,
+  itemTabs,
+  setItemTabs,
   draftRepairs,
   handleAddNewTab,
   nextButtonLabel,
@@ -39,7 +43,6 @@ export default function BuildTicketStep({
   activeItemIndex,
 }: BuildTicketStepProps) {
   const infoIcon = <InfoIcon size={16} />;
-  
   const renderFields = () => (
     <Box>
       <Container>
@@ -77,19 +80,26 @@ export default function BuildTicketStep({
               activeRepairIndex={activeRepairIndex}
             />
           </Stack>
-          <Button type="button">{nextButtonLabel}</Button>
+          <Button type="button" onClick={() => test()} >{/*nextButtonLabel*/}Add New Item</Button>
         </Paper>
       </Container>
     </Box>
   );
 
-  const defaultTabsConfig = {
+  const initialTab = itemTabs?.[0];
+  initialTab.content = renderFields();
+
+  // const itemTabs: typeof defaultTabsConfig[] = [defaultTabsConfig];
+  const test = () => {
+    const newItemTab = {
     id: crypto.randomUUID(),
     icon: infoIcon,
     label: "New Item",
     content: renderFields(),
   }
-  const itemTabs: typeof defaultTabsConfig[] = [defaultTabsConfig];
+   setItemTabs([...itemTabs, newItemTab]);
+   console.log(itemTabs);
+  };
 
   // const defaultTab = (
   //   <Tabs.Tab
