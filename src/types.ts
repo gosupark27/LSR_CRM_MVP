@@ -48,6 +48,7 @@ export interface PaymentInfo {
   total: number | string;
   deposit: number | string;
   balance: number | string;
+  fee: number | string;
 }
 
 export type Item = {
@@ -98,6 +99,7 @@ export const NewTicketPayload = (): NewTicketInfo => ({
       total: "",
       deposit: "",
       balance: "",
+      fee: "",
     },
     items: [],
   }

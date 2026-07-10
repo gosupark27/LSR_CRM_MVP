@@ -102,7 +102,6 @@ export default function BuildTicketStep({
   const initialTab = itemTabs?.[0];
   initialTab.content = renderFields();
 
-  // const itemTabs: typeof defaultTabsConfig[] = [defaultTabsConfig];
   const test = () => {
     const newItemTab = {
     id: crypto.randomUUID(),
@@ -113,18 +112,6 @@ export default function BuildTicketStep({
    setItemTabs([...itemTabs, newItemTab]);
    handleAddNewTab()
   };
-
-  // const defaultTab = (
-  //   <Tabs.Tab
-  //     leftSection={infoIcon}
-  //     value={String(itemTabs.length)}
-  //     key={itemTabs.length}
-  //   >
-  //     Add New Item
-  //     {renderFields()}
-  //   </Tabs.Tab>
-  // );
-  // itemTabs.push(defaultTab);
 
   const renderTabList = itemTabs.map((tab) => (
     <Tabs.Tab

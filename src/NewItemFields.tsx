@@ -132,24 +132,15 @@ export default function NewItemFields({
       <IconComponent size={16} style={{ display: "block" }} />
     );
     draftItem.item_type = val;
-    draftItem.item_id =
-      draftItem.item_id === undefined ? crypto.randomUUID() : draftItem.item_id;
+    draftItem.item_id = crypto.randomUUID();
+
     if (draftItem.repairs.length !== 0) {
       draftItem.repairs = [];
-      // console.log('diff item bitch')
-      // console.log(draftItem.repairs.length)
-      // const initDraftRepair = {
-      //   rp_service: null,
-      //   note: "",
-      //   cost: "",
-      // }
-      // draftItem.repairs?.push(initDraftRepair)
-      // setDraftRepairs(draftItem.repairs)
       setDraftItem(draftItem);
       console.log(draftItem);
       setIsResetRepairs();
     }
-    console.log(draftItem)
+    console.log("just added new item", draftItem);
     setDraftItem(draftItem);
     setIsDisabled();
   };
