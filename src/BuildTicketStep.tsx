@@ -11,7 +11,7 @@ import {
 import { InfoIcon } from "@phosphor-icons/react";
 import NewItemFields from "./NewItemFields";
 import NewRepairFields from "./NewRepairFields";
-import { DefaultTabsConfig, DraftItem, DraftRepair } from "./types";
+import { ItemTabs, DraftItem, DraftRepair } from "./types";
 import { useState } from "react";
 import { useNewTicketFormContext } from "./NewTicketFormContext";
 
@@ -21,8 +21,8 @@ interface BuildTicketStepProps {
   setDraftItem: (item: DraftItem) => void;
   draftItem: DraftItem;
   setDraftRepairs: (repairs: DraftRepair[]) => void;
-  itemTabs: DefaultTabsConfig[];
-  setItemTabs: (itemTabs: DefaultTabsConfig[]) => void;
+  itemTabs: ItemTabs[];
+  setItemTabs: (itemTabs: ItemTabs[]) => void;
   handleAddNewTab: () => void;
   draftRepairs: DraftRepair[];
   nextButtonLabel: string;
@@ -45,14 +45,19 @@ export default function BuildTicketStep({
   activeItemIndex,
 }: BuildTicketStepProps) {
   const form = useNewTicketFormContext();
+  const items = form.getValues().ticket_info.items;
   const [isDisabled, setIsDisabled] = useState<boolean>(draftItem.item_type === '');
   const handleIsDisabled = () => {
     setIsDisabled(draftItem.item_type === '');
   };
   const [isResetRepairs, setIsResetRepairs] = useState(false)
   const handleIsResetRepairs = () => setIsResetRepairs(draftItem.repairs.length === 0);
-  const tabIcon = draftItem.categoryIcon || <InfoIcon size={16} />;
-  const renderFields = () => (
+  const TabIcon = draftItem.categoryIcon || InfoIcon;
+  const tabIcon = <TabIcon size={16}/>;
+  const renderFields = (item_id:string) => {
+    const tabDraftItem = items.find((item) => item.item_id === item_id);
+    const item = tabDraftItem ?? draftItem
+    return (
     <Box>
       <Container>
         <Paper p="lg" shadow="sm" my="lg">
@@ -70,7 +75,7 @@ export default function BuildTicketStep({
               setDraftItem={setDraftItem}
               setIsDisabled={handleIsDisabled}
               setIsResetRepairs={handleIsResetRepairs}
-              draftItem={draftItem}
+              draftItem={item}
               activeItemIndex={activeItemIndex}
             />
           </Stack>
@@ -86,49 +91,52 @@ export default function BuildTicketStep({
             <NewRepairFields
               onSetActiveRepairIndex={onSetActiveRepairIndex}
               setDraftRepairs={setDraftRepairs}
-              draftItem={draftItem}
+              draftItem={item}
               isDisabled={isDisabled}
               isResetRepairs={isResetRepairs}
               activeItemIndex={activeItemIndex}
               activeRepairIndex={activeRepairIndex}
             />
           </Stack>
-          <Button type="button" disabled={draftItem.repairs.length === 0} onClick={() => test()} >{/*nextButtonLabel*/}Add New Item</Button>
+          <Button type="button" disabled={item.repairs.length === 0} onClick={() => addNewItem()} >{/*nextButtonLabel*/}Add New Item</Button>
         </Paper>
       </Container>
     </Box>
-  );
+  )};
 
   const initialTab = itemTabs?.[0];
-  initialTab.content = renderFields();
+  // initialTab.content = renderFields();
 
-  const test = () => {
+  const addNewItem = () => {
     const newItemTab = {
-    id: crypto.randomUUID(),
-    icon: tabIcon,
+    id: draftItem.item_id,
+    icon: draftItem.categoryIcon,
     label: draftItem.item_type || "New Item",
-    content: renderFields(),
+    // content: renderFields(),
   }
    setItemTabs([...itemTabs, newItemTab]);
    handleAddNewTab()
   };
 
-  const renderTabList = itemTabs.map((tab) => (
+  const renderTabList = itemTabs.map((tab) => {
+    const ItemIcon = tab.icon
+    return(
+    
     <Tabs.Tab
-      leftSection={tab.icon}
+      leftSection={<ItemIcon size={16}/>}
       value={tab.id}
       key={tab.id}
     >
       {tab.label}
     </Tabs.Tab>
-  ));
+  )});
+
   const renderTabsPanel = itemTabs.map((tab) =>(
     <Tabs.Panel
       value={tab.id}
       key={tab.id}
-      children={tab.content}
     >
-
+      {renderFields(tab.id)}
     </Tabs.Panel>
   ))
 
@@ -136,6 +144,7 @@ export default function BuildTicketStep({
     <Tabs 
       defaultValue={itemTabs?.[0].id}
       value={draftItem.item_id || itemTabs?.[0].id}
+
     >
       <Tabs.List>{renderTabList}</Tabs.List>
       {renderTabsPanel}

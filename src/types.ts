@@ -1,3 +1,5 @@
+import { Icon } from "@phosphor-icons/react";
+
 type Status = "received" | "in_progress" | "ready_for_pickup" | "picked_up";
 
 export interface NewTicketInfo {
@@ -24,10 +26,10 @@ export interface TicketInfo {
 export interface DraftItem {
   item_type: string;
   category: string;
-  categoryIcon?: React.JSX.Element
+  categoryIcon: Icon;
   note: string;
   repairs: DraftRepair[];
-  item_id?: string | undefined;
+  item_id: string;
 }
 
 export interface DraftRepair {
@@ -73,12 +75,10 @@ export type RepairFormValues = {
   repairs: Repair[];
 };
 
-export type DefaultTabsConfig = {
+export type ItemTabs = {
     id: string;
-    icon: React.JSX.Element;
+    icon: Icon;
     label: string;
-    content?: React.JSX.Element;
-
 }
 
 export const NewTicketPayload = (): NewTicketInfo => ({

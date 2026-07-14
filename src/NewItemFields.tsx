@@ -121,29 +121,42 @@ export default function NewItemFields({
   });
 
   const handleNoteField = () => {
-    draftItem.note = noteRef.current?.value ?? "";
-    setDraftItem(draftItem);
+    const note = noteRef.current?.value ?? "";
+    const newDraftItem = {
+      ...draftItem, 
+      note
+    }
+    setDraftItem(newDraftItem);
   };
 
-  const handleDraftItem = (val: string, category: string) => {
+  const handleDraftItem = (item_type: string, category: string) => {
     draftItem.category = category;
-    const IconComponent = categoryLabels[category];
-    draftItem.categoryIcon = (
-      <IconComponent size={16} style={{ display: "block" }} />
-    );
-    draftItem.item_type = val;
-    draftItem.item_id = crypto.randomUUID();
+    draftItem.categoryIcon = categoryLabels[category];
+    draftItem.item_type = item_type;
+    // draftItem.item_id = crypto.randomUUID();
+
+    const newDraftItem = {
+      category: category,
+      categoryIcon: categoryLabels[category],
+      item_type: item_type,
+      item_id: draftItem.item_id,
+      note: draftItem.note,
+      repairs: draftItem.repairs
+    }
 
     if (draftItem.repairs.length !== 0) {
-      draftItem.repairs = [];
-      setDraftItem(draftItem);
-      console.log(draftItem);
+      newDraftItem.repairs = [];
+      setDraftItem(newDraftItem);
       setIsResetRepairs();
+      console.log('editing an already existing item', typeof newDraftItem.repairs, newDraftItem.repairs, newDraftItem.repairs.length);
     }
-    console.log("just added new item", draftItem);
-    setDraftItem(draftItem);
+    console.log("ItemFields: just added new item", newDraftItem);
+    setDraftItem(newDraftItem);
     setIsDisabled();
   };
+
+  // TODO: DELETE
+  // console.log(typeof draftItem.categoryIcon, draftItem.categoryIcon)
 
   return (
     <Stack>

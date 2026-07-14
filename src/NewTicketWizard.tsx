@@ -14,7 +14,7 @@ import {
   DraftItem,
   DraftRepair,
   NewTicketInfo,
-  DefaultTabsConfig,
+  ItemTabs,
 } from "./types.ts";
 import LiveWorkOrder from "./LiveWorkOrder.tsx";
 import BuildTicketStep from "./BuildTicketStep.tsx";
@@ -32,49 +32,89 @@ export default function NewTicketWizard() {
   const [activeRepairIndex, setActiveRepairIndex] = useState(0);
   const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
-  
-  const infoIcon = <InfoIcon size={16} />;
-  const defaultTabsConfig: DefaultTabsConfig = {
-    id: crypto.randomUUID(),
-    icon: infoIcon,
-    label: "New Item",
-  }
-  const [itemTabs, setItemTabs] = useState<DefaultTabsConfig[]>([defaultTabsConfig]);
-
-  const [isUrgent, setIsUrgent] = useState(false);
 
   const form = useNewTicketForm({
-    mode: 'uncontrolled',
+    mode: "uncontrolled",
     initialValues: {
       ...NewTicketPayload(),
     },
   });
 
-  const handleIsUrgent = (isUrgent: boolean) => {
-    setIsUrgent(isUrgent);
-  }
-
-  form.watch('ticket_info.date_info.urgent', ({value} )=> handleIsUrgent(value))
+  form.watch("ticket_info.date_info.urgent", ({ value }) =>
+    handleIsUrgent(value),
+  );
 
   const initDraftItem: DraftItem = {
-    category: '',
-    item_type: '',
-    note: '',
-    repairs: []
+    category: "",
+    item_type: "",
+    note: "",
+    repairs: [],
+    item_id: crypto.randomUUID(),
+    categoryIcon: InfoIcon,
   };
 
-
   const [draftItem, setDraftItem] = useState<DraftItem>(initDraftItem);
-  const [draftRepairs, setDraftRepairs] = useState<DraftRepair []>(initDraftItem.repairs);
+  const [draftRepairs, setDraftRepairs] = useState<DraftRepair[]>(
+    initDraftItem.repairs,
+  );
 
-  const handleDraftItem = (item : DraftItem) => setDraftItem(item);
-  const handleDraftRepairs = (repairs : DraftRepair[]) => setDraftRepairs(repairs);
+  const handleTabUpdate = (tab: ItemTabs) => {
+    const updatedTabList = itemTabs.map((itemTab) => {
+      if (itemTab.id == draftItem.item_id) {
+        return tab;
+      }
+      return itemTab;
+    });
+    console.log('handleTabUpdate(), here is the updatedTabList', updatedTabList)
+    console.log(
+      "the itemTabs should have the activeTab updated",
+      itemTabs.find((tab) => tab.id === draftItem.item_id),
+    );
+    setItemTabs(updatedTabList);
+  };
+
+  const handleDraftItem = (item: DraftItem) => {
+    const updatedItemTab = {
+      id: item.item_id,
+      icon: item.categoryIcon,
+      label: item.item_type,
+    };
+    console.log("here is the passed in item from the child comp", item);
+    console.log("tab has been updated", updatedItemTab);
+    setDraftItem(item);
+    console.log('updated draftItem', item)
+    handleTabUpdate(updatedItemTab);
+  };
+
+  const handleDraftRepairs = (repairs: DraftRepair[]) =>
+    setDraftRepairs(repairs);
+
+  const initTab: ItemTabs = {
+    id: draftItem.item_id,
+    icon: draftItem.categoryIcon,
+    label: "New Item",
+  };
+  const [itemTabs, setItemTabs] = useState<ItemTabs[]>([initTab]);
 
   const handleAddNewTab = () => {
-    form.insertListItem('ticket_info.items', draftItem);
-    form.setFieldValue('ticket_info.items', form.getValues().ticket_info.items);
+    form.insertListItem("ticket_info.items", draftItem);
+    console.log(
+      "Creating new tab, saving prior draftItem",
+      form.getValues().ticket_info.items,
+    );
+    // form.setFieldValue('ticket_info.items', form.getValues().ticket_info.items);
     setDraftItem(initDraftItem);
-  }
+    console.log(
+      "new tab = new initDraftItem; should expect default config",
+      draftItem,
+    );
+  };
+
+  const [isUrgent, setIsUrgent] = useState(false);
+
+  const handleIsUrgent = (isUrgent: boolean) => {
+    setIsUrgent(isUrgent);
+  };
 
   const handleStepChange = (nextStep: number) => {
     const isOutofBounds = nextStep > 4 || nextStep < 0;
@@ -88,8 +128,6 @@ export default function NewTicketWizard() {
   };
 
   const ticketPayload: NewTicketInfo = NewTicketPayload();
-
-  
 
   const shouldAllowSelectStep = (step: number) =>
     highestStepVisited >= step && active != step;
@@ -216,7 +254,7 @@ export default function NewTicketWizard() {
           </Stack>
         </AppShell.Main>
         <AppShell.Aside>
-          <LiveWorkOrder/>
+          <LiveWorkOrder />
         </AppShell.Aside>
       </AppShell>
     </NewTicketFormProvider>
